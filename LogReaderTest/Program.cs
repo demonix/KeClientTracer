@@ -83,7 +83,7 @@ namespace LogReaderTest
             
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serverUrl + "getfilename");
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serverUrl + "getnextfile");
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 using (Stream responseStream = response.GetResponseStream())
                 using (StreamReader responseStreamReader = new StreamReader(responseStream, Encoding.UTF8))
@@ -132,7 +132,16 @@ namespace LogReaderTest
             {
                 fileName = String.Format("{0}\\{1}.{2}.{3}.{4}.requestData", outPath, dt.Year.ToString("D4"), dt.Month.ToString("D2"), dt.Day.ToString("D2"), counter.ToString("D4"));
                 if (!File.Exists(fileName))
-                    return fileName;
+                    try
+                    {
+                        File.Create(fileName);
+                        return fileName;
+                    }
+                    catch (Exception exception)
+                    {
+                        continue;
+                    }
+
             }
             throw new IOException(String.Format("Перебрали 1000 файлов, но все они уже существуют: {0}",fileName));
         }

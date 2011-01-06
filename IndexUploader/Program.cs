@@ -11,6 +11,7 @@ namespace IndexUploader
     {
         static void Main(string[] args)
         {
+            
             HttpWebRequest wr = (HttpWebRequest)WebRequest.Create("http://localhost:1818/logManager/index/2010.12.05?test=tre");
             wr.Method = "POST";
             string data = File.ReadAllText("2010.12.05.index");
