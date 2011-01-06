@@ -1,6 +1,6 @@
 namespace LogManagerService.Handlers
 {
-    public class HandlerBase
+    public class StatsHandler
     {
         
     }
