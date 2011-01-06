@@ -119,7 +119,7 @@ namespace LogManagerService.Handlers
                 default:
                     {
                         command.CommandText += String.Format(" and {0} {2} @{1}", name, name, value.Contains("*") ? "like" : "=");
-                        command.Parameters.Add(String.Format("@{0}", name), SqlDbType.Date).Value = value.Replace("*", "%");
+                        command.Parameters.Add(String.Format("@{0}", name), SqlDbType.VarChar).Value = value.Replace("*", "%");
                         break;
                     }
             }
