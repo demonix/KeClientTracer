@@ -69,8 +69,8 @@ namespace LogManagerService.Handlers
                         string ip = reader.GetString(3);
                         string inn = reader.GetString(4); ;
                         string sessionId = reader.GetString(5); ;
-                        DateTime sessionStart = reader.GetDateTime(6);
-                        DateTime sessionEnd = reader.GetDateTime(7);
+                        TimeSpan sessionStart = reader.GetTimeSpan(6);
+                        TimeSpan sessionEnd = reader.GetTimeSpan(7);
                         results.Add(new FindResultEntry(id,date,host,ip,inn,sessionId,sessionStart,sessionEnd));
                     }
                 }
@@ -144,7 +144,7 @@ namespace LogManagerService.Handlers
         public string ToSimpleHtml()
         {
             StringBuilder result = new StringBuilder();
-            result.Append("<html><table><tr>");
+            result.Append("<html><head><meta http-equiv=\"content-type\" content=\"text/html;charset=UTF-8\"/></head><table><tr>");
             result.Append("<td>Id</td>");
             result.Append("<td>Date</td>");
             result.Append("<td>Host</td>");
@@ -169,10 +169,10 @@ namespace LogManagerService.Handlers
         string ip;
         string inn;
         string sessionId;
-        DateTime sessionStart;
-        DateTime sessionEnd;
+        TimeSpan sessionStart;
+        TimeSpan sessionEnd;
 
-        public FindResultEntry(Guid id, DateTime date, string host, string ip, string inn, string sessionId, DateTime sessionStart, DateTime sessionEnd)
+        public FindResultEntry(Guid id, DateTime date, string host, string ip, string inn, string sessionId, TimeSpan sessionStart, TimeSpan sessionEnd)
         {
             this.id = id;
             this.date = date;
@@ -194,8 +194,8 @@ namespace LogManagerService.Handlers
             result.AppendFormat("<td>{0}</td>", ip);
             result.AppendFormat("<td>{0}</td>", inn);
             result.AppendFormat("<td>{0}</td>", sessionId);
-            result.AppendFormat("<td>{0}</td>", sessionStart.ToString("HH:mm:ss (K)"));
-            result.AppendFormat("<td>{0}</td>", sessionEnd.ToString("HH:mm:ss (K)"));
+            result.AppendFormat("<td>{0}:{1}:{2}</td>", sessionStart.Hours.ToString("D2"), sessionStart.Minutes.ToString("D2"), sessionStart.Seconds.ToString("D2"));
+            result.AppendFormat("<td>{0}:{1}:{2}</td>", sessionEnd.Hours.ToString("D2"), sessionEnd.Minutes.ToString("D2"), sessionEnd.Seconds.ToString("D2"));
             result.Append("</tr>");
             return result.ToString();
 
