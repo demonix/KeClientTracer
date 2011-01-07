@@ -74,6 +74,7 @@ namespace LogReaderTest
             }
 
             Console.Out.WriteLine("Finished all in "+ts);
+            CloseFileStreams();
             Console.ReadKey();
 
         }
@@ -150,6 +151,7 @@ namespace LogReaderTest
         {
             foreach (KeyValuePair<string, FileStream> keyValuePair in _fileStreams)
             {
+                keyValuePair.Value.Flush();
                 keyValuePair.Value.Close();
                 keyValuePair.Value.Dispose();
             }

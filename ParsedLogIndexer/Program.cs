@@ -19,8 +19,15 @@ namespace ParsedLogIndexer
             {
                 string indexFileName = String.Format("{0}\\{1}.index", file.DirectoryName,
                                                      Path.GetFileNameWithoutExtension(file.FullName));
+
                 if (File.Exists(indexFileName))
-                    continue;
+                {
+                    FileInfo indexFileInfo = new FileInfo(indexFileName);
+                    if (indexFileInfo.LastWriteTimeUtc < file.LastWriteTimeUtc)
+                        File.Delete(indexFileName);
+                    else
+                        continue;
+                }
 
                 using (Indexer indexer = new Indexer(file, '\t'))
                 {

@@ -10,7 +10,7 @@ namespace LogManagerService
         public const string LastLogHashesFileName = "lastLogHashes.txt";
         public const double LogListRefreshInterval = 2*60*60;
         private static string _weblogIndexDbConnectionString;
-        public string WeblogIndexDbConnectionString
+        public static string WeblogIndexDbConnectionString
         {
             get
             {
