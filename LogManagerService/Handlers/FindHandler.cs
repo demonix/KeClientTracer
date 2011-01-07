@@ -42,7 +42,7 @@ namespace LogManagerService.Handlers
         {
 
             FindResult results = new FindResult();
-            using (SqlConnection connection = new SqlConnection("Data Source=;Initial Catalog=WeblogIndex;Integrated security=SSPI"))
+            using (SqlConnection connection = new SqlConnection(Settings.WeblogIndexDbConnectionString))
             {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand())

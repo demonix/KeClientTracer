@@ -75,8 +75,9 @@ namespace LogManagerService.Handlers
                 
                
             }
-           
-                SqlBulkCopy bulk = new SqlBulkCopy("Data Source=;Initial Catalog=WeblogIndex;Integrated security=SSPI");
+
+            
+            SqlBulkCopy bulk = new SqlBulkCopy(Settings.WeblogIndexDbConnectionString);
                 bulk.DestinationTableName = "LogIndex";
                 bulk.WriteToServer(dataTable);
            
@@ -85,7 +86,7 @@ namespace LogManagerService.Handlers
 
         private void RemoveExistingIndex()
         {
-            using (SqlConnection connection = new SqlConnection("Data Source=;Initial Catalog=WeblogIndex;Integrated security=SSPI"))
+            using (SqlConnection connection = new SqlConnection(Settings.WeblogIndexDbConnectionString))
             {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand( "delete from LogIndex where date = @dateToDelete", connection))
