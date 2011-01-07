@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace LogSorter
+namespace Common
 {
-    public class FileNameHelpers
+    public class FileUtils
     {
         public static DateTime FileNameToDate(string file)
         {
@@ -14,8 +14,7 @@ namespace LogSorter
 
             string date = fileName.Substring(0, 10);
             string[] dateParts = date.Split('.');
-            return new DateTime(Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]),
-                                Convert.ToInt32(dateParts[2]));
+            return new DateTime(Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[2]));
 
         }
 
@@ -28,6 +27,20 @@ namespace LogSorter
             if (!String.IsNullOrEmpty(extension))
                 fileNameBuilder.AppendFormat(".{0}", extension);
             return fileNameBuilder.ToString();
+        }
+
+        public static void ChangeExtension(string file, string newExtension, int tries)
+        {
+            for (int i = 0; i < tries; i++)
+            {
+                string destFileName = Path.ChangeExtension(file, newExtension);
+                if (i != 0)
+                    destFileName = Path.ChangeExtension(file, String.Format("{0}.{1}", i.ToString("D3"), newExtension));
+                if (File.Exists(destFileName)) continue;
+                File.Move(file, destFileName);
+                return;
+            }
+            throw new Exception(String.Format("Can't change extension of file {0} to {1} after {2} tries. File with new extension already exists.", file, newExtension, tries));
         }
     }
 }

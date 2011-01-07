@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Common;
+
 
 namespace LogSorter
 {
@@ -29,7 +31,7 @@ namespace LogSorter
 
         private List<string> GetFileList()
         {
-            return Directory.GetFiles(Folder, FileNameHelpers.DateToFileName("", DateOfLogs, "*.requestData")).ToList();
+            return Directory.GetFiles(Folder, FileUtils.DateToFileName("", DateOfLogs, "*.requestData")).ToList();
         }
 
         protected List<string> FileList { get; private set; }
@@ -60,22 +62,13 @@ namespace LogSorter
         {
             _semaphore.Release(1);
             foreach (string file in FileList)
-                for (int i = 0; i < 10; i++)
-                {
-                    string destFileName = Path.ChangeExtension(file, "processedRequestData");
-                    if (i != 0)
-                        destFileName = Path.ChangeExtension(file, "processedRequestData-" + i.ToString("D2"));
-                    if (File.Exists(destFileName)) continue;
-                    File.Move(file, destFileName);
-                    break;
-                }
-
+                FileUtils.ChangeExtension(file, "processedRequestData", 10);
         }
 
         private string GetCommandLine()
         {
             string tempFolder = String.Format("\"{0}\\tmp\"", Folder);
-            string outputFile = String.Format("{0}\\sorted\\{1}", Folder, FileNameHelpers.DateToFileName("", DateOfLogs, "sorted"));
+            string outputFile = String.Format("{0}\\sorted\\{1}", Folder, FileUtils.DateToFileName("", DateOfLogs, "sorted"));
             StringBuilder fileListBuilder = new StringBuilder();
             foreach (string file in FileList)
             {

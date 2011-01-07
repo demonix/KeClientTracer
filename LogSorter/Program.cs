@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
+using Common;
 
 namespace LogSorter
 {
@@ -44,7 +45,7 @@ namespace LogSorter
             string[] files = Directory.GetFiles(folderPath,"*.requestData");
             foreach (string file in files)
             {
-                DateTime dt = FileNameHelpers.FileNameToDate(file);
+                DateTime dt = FileUtils.FileNameToDate(file);
                 if (!result.Contains(dt))
                     result.Add(dt);
             }
