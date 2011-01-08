@@ -7,7 +7,7 @@ namespace Common.ThreadSafeObjects
     public class ThreadSafeList<T> 
     {
         private List<T> _list = new List<T>();
-        private object _listLocker = new object();
+        private object _locker = new object();
         private int _count = 0;
         private bool _listChanged;
         private List<T> _listCached;
@@ -15,7 +15,7 @@ namespace Common.ThreadSafeObjects
 
         public void Add(T item)
         {
-            lock (_listLocker)
+            lock (_locker)
             {
                 _list.Add(item);
                 _count++;
@@ -26,17 +26,31 @@ namespace Common.ThreadSafeObjects
         {
             set
             {
-                lock (_listLocker)
+                lock (_locker)
                 {
                     _list[index] = value;
                 }
             }
         }
 
+        public List<T> GetSnapshot()
+        {
+
+            List<T> items = new List<T>();
+            lock (_locker)
+            {
+                foreach (T item in _list)
+                {
+                    items.Add(item);
+                }
+            }
+            return items;
+        }
+
         public bool TryGet(int index, out T item)
         {
             item = default(T);
-            lock (_listLocker)
+            lock (_locker)
             {
                 if (index >= _count) return false;
                 item = _list[index];
@@ -47,7 +61,7 @@ namespace Common.ThreadSafeObjects
 
         public void Remove(T item)
         {
-            lock (_listLocker)
+            lock (_locker)
             {
                 _list.Remove(item);
                 _count--;
@@ -56,7 +70,7 @@ namespace Common.ThreadSafeObjects
 
         public void AddRange(IEnumerable<T> items)
         {
-            lock (_listLocker)
+            lock (_locker)
             {
                 foreach (T item in items)
                 {
@@ -67,7 +81,7 @@ namespace Common.ThreadSafeObjects
 
         public void Clear()
         {
-            lock (_listLocker)
+            lock (_locker)
             {
                 _list.Clear();
                 _count=0;
@@ -79,7 +93,7 @@ namespace Common.ThreadSafeObjects
         {
             get
             {
-                lock (_listLocker)
+                lock (_locker)
                 {
                     return _count;
                 }
@@ -89,7 +103,7 @@ namespace Common.ThreadSafeObjects
 
         public T FirstOrDefault(Func<T,bool> func)
         {
-            lock (_listLocker)
+            lock (_locker)
             {
                 return _list.FirstOrDefault(func);
             }

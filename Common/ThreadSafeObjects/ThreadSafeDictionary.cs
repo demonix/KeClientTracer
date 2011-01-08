@@ -34,10 +34,9 @@ namespace Common.ThreadSafeObjects
             }
 
 
-            public List<KeyValuePair<T,T2>> Items
+            public List<KeyValuePair<T,T2>> GetSnapshot()
             {
-                get
-                {
+                
                     List<KeyValuePair<T, T2>> items = new List<KeyValuePair<T, T2>>();
                     lock (_locker)
                     {
@@ -47,8 +46,9 @@ namespace Common.ThreadSafeObjects
                         }
                     }
                     return items;
-                }
+                
             }
+
             public bool TryGet(T key, out T2 value)
             {
                 value = default(T2);
