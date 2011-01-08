@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndexUploader", "IndexUploader\IndexUploader.csproj", "{1DFE5F27-3AD1-44D7-B6EB-7D9BEAA54109}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeClientTracing", "KeClientTracing\KeClientTracing.csproj", "{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +197,16 @@ Global
 		{1DFE5F27-3AD1-44D7-B6EB-7D9BEAA54109}.Release|Mixed Platforms.Build.0 = Release|x86
 		{1DFE5F27-3AD1-44D7-B6EB-7D9BEAA54109}.Release|x86.ActiveCfg = Release|x86
 		{1DFE5F27-3AD1-44D7-B6EB-7D9BEAA54109}.Release|x86.Build.0 = Release|x86
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

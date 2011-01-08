@@ -13,38 +13,17 @@ namespace IndexUploader
         private static string _server;
         static void Main(string[] args)
         {
+            if (args.Length !=2)
+                throw new Exception("invalid args.");
+
             _server = args[0];
+            KeClientTracing.IndexUploader indexUploader = new KeClientTracing.IndexUploader(_server);
             string[] indexFileNames = Directory.GetFiles(args[1], "*.index");
             foreach (string indexFileName in indexFileNames)
             {
-                if (SendIndex(indexFileName))
-                    FileUtils.ChangeExtension(indexFileName,"uploadedIndex",10);
+                indexUploader.Enqueue(indexFileName);
             }
-
-        }
-
-        private static bool SendIndex(string indexFileName)
-        {
-            try
-            {
-                DateTime dt = FileUtils.FileNameToDate(indexFileName);
-                HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(String.Format("{0}/logManager/index/{1}.{2}.{3}", _server, dt.Year, dt.Month, dt.Day));
-                wr.Method = "POST";
-                string data = File.ReadAllText(indexFileName);
-                byte[] dataBytes = Encoding.Default.GetBytes(data);
-                wr.ContentLength = dataBytes.Length;
-                Stream reqestStream = wr.GetRequestStream();
-                reqestStream.Write(dataBytes, 0, dataBytes.Length);
-                reqestStream.Close();
-                wr.GetResponse();
-                return true;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-                return false;
-            }
-            
+            indexUploader.StartUpload();
         }
     }
 }

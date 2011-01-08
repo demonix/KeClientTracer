@@ -138,12 +138,12 @@ namespace LogManagerService
             File.WriteAllText(Settings.LastLogHashesFileName, "");
             lock (LastKnownLogHashes)
             {
-                foreach (KeyValuePair<string, string> logHash in ServiceState.GetInstance().LastKnownLogHashes.Items)
+                List<KeyValuePair<string, string>> snapshot = ServiceState.GetInstance().LastKnownLogHashes.GetSnapshot();
+                foreach (KeyValuePair<string, string> logHash in snapshot)
                 {
                     File.AppendAllText(Settings.LastLogHashesFileName, String.Format("{0}\t{1}\r\n", logHash.Key, logHash.Value));
                 }
             }
-
         }
 
         public string PendingLogList
