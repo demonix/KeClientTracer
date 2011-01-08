@@ -35,14 +35,23 @@ namespace ParsedLogIndexer
                     while (indexer.ReadUpToNextKey())
                     {
                        
-                        string s = String.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n",
+                        try
+                        {
+                            string s = String.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n",
                                                  indexer.CurrentKey.Replace("^", "\t"),
                                                  indexer.StartPosition,
                                                  indexer.EndPosition -
                                                  indexer.StartPosition + 2,
                                                  indexer.FirstKeyLine.Split('\t')[1],
                                                  indexer.LastKeyLine.Split('\t')[1]);
-                        WriteIndexEntry(indexFileName, s);
+                            WriteIndexEntry(indexFileName, s);
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.Out.WriteLine(
+                                "Error {0} while indexing line with key {1}. First line: {2}. Last line: {3}",
+                                ex.Message, indexer.CurrentKey, indexer.FirstKeyLine, indexer.LastKeyLine);
+                        }
                     }
                 }
 
