@@ -12,18 +12,18 @@ namespace LogReaderApp
     {
         static void Main(string[] args)
         {
-            string outPath="";
+            string outPath=".\\logs";
             if (File.Exists("outPath"))
                 outPath = File.ReadAllText("outPath");
-            outPath = outPath.TrimEnd('\\');
             Reader reader = new Reader(outPath);
             
             string inputFile;
-            while (GetNextFileNameToProcess(out inputFile, args[0]))
+            while (GetNextFileNameToProcess(out inputFile, args[0].TrimEnd('/')))
             {
                 reader.Read(inputFile,true);
             }
 
+            Console.ReadKey();
 
         }
 

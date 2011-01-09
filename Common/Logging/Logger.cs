@@ -75,14 +75,19 @@ namespace Common.Logging
         {
             for (int counter = 0; counter <= 1000; counter++)
             {
+                
                 string fileName = String.Format("log\\{0}-{1}{2}", label, DateConversions.DateToYmd(DateTime.Now),
                                                 counter == 0 ? "" : String.Format(".{0}", counter.ToString("D4")));
                 try
                 {
+                    string dir = Path.GetDirectoryName(fileName);
+
+                    if (!String.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
                     FileStream result = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
                     return result;
                 }
-                catch (IOException)
+                catch (IOException exception)
                 {
                     continue;
                 }

@@ -20,7 +20,11 @@ namespace LogProcessors
             requestData = null;
             error = null;
             nginxLogLine.FillFromString(line);
-            
+            if (!nginxLogLine.HasAllFields)
+            {
+                error = "log line [\""+ line + "\"] in not correct "+ nginxLogLine.GetType().Name;
+                return false;
+            }
 
             //Console.WriteLine("on msg");
             //Console.ReadKey();););

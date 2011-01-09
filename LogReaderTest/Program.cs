@@ -185,6 +185,7 @@ namespace LogReaderTest
             if (!lp.Process(e.Line, out meta, out requestData, out error))
             {
                 WriteError(error);
+                return;
             }
 
             lock (locker)

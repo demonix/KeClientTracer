@@ -14,7 +14,12 @@ namespace KeClientTracing.LogReading
         public NginxLogLine(string line) : base(line)
         {
         }
-        
+
+        public override bool HasAllFields
+        {
+            get { return SplittedLine.Length > 17; }
+        }
+
         public void FillFromString(string line)
         {
             base.FillFromString(line);

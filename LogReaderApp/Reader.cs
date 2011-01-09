@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Common;
+using Common.Logging;
 using KeClientTracing.LogReading;
 using LogProcessors;
 
@@ -15,7 +16,8 @@ namespace LogReaderApp
         public Reader(string outPath)
         {
             InstanceId = Guid.NewGuid();
-            _outPath = outPath;
+
+            _outPath = outPath.TrimEnd('\\');
         }
 
         KeFrontLogProcessor lp = new KeFrontLogProcessor();
@@ -58,12 +60,19 @@ namespace LogReaderApp
                     lr.Close();
                 _stopwatch.Stop();
                 _stopwatch.Reset();
+                FlushFileStreams();
             }
             _isReading = 0;
         }
 
     
-
+        private void FlushFileStreams()
+        {
+            foreach (KeyValuePair<string, FileStream> keyValuePair in _fileHandlesCache)
+            {
+                keyValuePair.Value.Flush();
+            }
+        }
         private  void OnFinishedReading(object sender, EventArgs e)
         {
             _finishedReading.Set();
@@ -76,9 +85,10 @@ namespace LogReaderApp
             string error;
             if (!lp.Process(e.Line, out meta, out requestData, out error))
             {
-                Common.Logging.Logger.WriteErrorToFile("logreader",error);
+                Logger.WriteErrorToFile("logreader", error);
+                return;
             }
- string key = meta.Replace('\t', '^');
+            string key = meta.Replace('\t', '^');
             byte[] lineB2 = Encoding.Default.GetBytes(key + "\t" + requestData + "\r\n");
             FileStream fs = GetResultFile(meta.Split('\t')[0]);
             lock (_resultWriteLocker)

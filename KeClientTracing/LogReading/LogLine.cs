@@ -39,6 +39,7 @@ namespace KeClientTracing.LogReading
         public abstract string Result { get; }
         public abstract string TimeTaken { get; }
         public abstract string UserAgent { get; }
+        public abstract bool HasAllFields { get; }
 
 
         protected void FillFromString(string line)
