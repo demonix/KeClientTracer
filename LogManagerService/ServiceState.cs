@@ -11,7 +11,7 @@ namespace LogManagerService
     public class ServiceState
     {
 
-
+        
         public ThreadSafeList<RotatedLog> AllLogs { get; private set; }
         public ThreadSafeDictionary<string, string> LastKnownLogHashes { get; private set; }
         //private static Queue<string> _pendingLogHashes = new Queue<string>();
@@ -103,7 +103,7 @@ namespace LogManagerService
                             if (HashesOfPendingLogs.Items.Contains(freshRotatedLog.Hash))
                                 continue;
                             HashesOfPendingLogs.Enqueue(freshRotatedLog.Hash);
-                            File.AppendAllText(Settings.OpLogPath, String.Format("a\t{0}\r\n", freshRotatedLog.Hash));
+                            OpLog.Add(freshRotatedLog.Hash);
                         }
                         if (freshLogs.Count > 0)
                             if (LastKnownLogHashes.ContainsKey(key))

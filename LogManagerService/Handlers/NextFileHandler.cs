@@ -8,6 +8,8 @@ namespace LogManagerService.Handlers
 {
     public class NextFileHandler: HandlerBase
     {
+        private static object _oplogLocker = new object();
+
         public NextFileHandler(HttpListenerContext httpContext) : base(httpContext)
         {
         }
@@ -47,7 +49,7 @@ namespace LogManagerService.Handlers
                 if (rotatedLog != null)
                 {
                     result = rotatedLog.FileName;
-                    File.AppendAllText(Settings.OpLogPath, String.Format("r\t{0}\r\n", hash));
+                    OpLog.Remove(hash1);
                     break;
                 }
                 hashesOfUnalavaliableFiles.Add(hash1);

@@ -84,6 +84,7 @@
     <Compile Include="Handlers\IndexHandler.cs" />
     <Compile Include="Handlers\NextFileHandler.cs" />
     <Compile Include="Handlers\StatsHandlerBase.cs" />
+    <Compile Include="OpLog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RotatedLog.cs" />
