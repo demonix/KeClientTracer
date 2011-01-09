@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 
-namespace LogReader
+namespace KeClientTracing.LogReading
 {
     public sealed class WebLogReader : LogReaderBase
     {

@@ -43,7 +43,7 @@
     <Compile Include="AsyncClientConnectionState.cs" />
     <Compile Include="AsyncServerConnectionState.cs" />
     <Compile Include="BufferManager.cs" />
-    <Compile Include="Client.cs" />
+    <Compile Include="NetClient.cs" />
     <Compile Include="Events\ClientConnectedEventArgs.cs" />
     <Compile Include="Events\MessageReceivedEventArgs.cs" />
     <Compile Include="NetworkMessage.cs" />

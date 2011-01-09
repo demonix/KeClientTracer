@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace LogReader
+namespace KeClientTracing.LogReading
 {
     public class NginxLogLine : LogLine
     {

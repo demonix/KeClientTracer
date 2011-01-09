@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LogReader
+namespace KeClientTracing.LogReading
 {
     public class LineReadedEventArgs : EventArgs
     {

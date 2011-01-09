@@ -2,9 +2,9 @@
 using System.IO;
 using System.Text;
 
-namespace LogReader
+namespace KeClientTracing.LogReading
 {
-    public abstract class LogReaderBase
+    public abstract class LogReaderBase : ILogReader
     {
         protected string _logFileName;
         protected long _currentPosition;

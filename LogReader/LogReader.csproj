@@ -44,13 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GzWebLogReader.cs" />
-    <Compile Include="LineReadedEventArgs.cs" />
-    <Compile Include="LineSplitter.cs" />
-    <Compile Include="LogLine.cs" />
-    <Compile Include="LogReaderBase.cs" />
-    <Compile Include="NginxLogLine.cs" />
-    <Compile Include="WebLogReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

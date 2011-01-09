@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Net;
-using System.Text;
 using Common;
 using Common.ThreadSafeObjects;
 using Common.Web;
 
-namespace KeClientTracing
+namespace KeClientTracing.LogIndexing
 {
     public class IndexUploader
     {

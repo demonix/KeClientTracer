@@ -17,12 +17,10 @@ namespace IndexUploader
                 throw new Exception("invalid args.");
 
             _server = args[0];
-            KeClientTracing.IndexUploader indexUploader = new KeClientTracing.IndexUploader(_server);
+            KeClientTracing.LogIndexing.IndexUploader indexUploader = new KeClientTracing.LogIndexing.IndexUploader(_server);
             string[] indexFileNames = Directory.GetFiles(args[1], "*.index");
             foreach (string indexFileName in indexFileNames)
-            {
                 indexUploader.Enqueue(indexFileName);
-            }
             indexUploader.StartUpload();
         }
     }

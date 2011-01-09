@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Text;
 
-
-namespace LogReader
+namespace KeClientTracing.LogReading
 {
     public abstract class LogLine
     {

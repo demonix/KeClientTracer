@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\ext\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,8 +42,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="IndexUploader.cs" />
+    <Compile Include="LogIndexing\IndexUploader.cs" />
+    <Compile Include="LogReading\GzWebLogReader.cs" />
+    <Compile Include="LogReading\ILogReader.cs" />
+    <Compile Include="LogReading\LineReadedEventArgs.cs" />
+    <Compile Include="LogReading\LogLine.cs" />
+    <Compile Include="LogReading\LogReader.cs" />
+    <Compile Include="LogReading\LogReaderBase.cs" />
+    <Compile Include="LogReading\NginxLogLine.cs" />
+    <Compile Include="LogReading\WebLogReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

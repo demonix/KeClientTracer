@@ -6,8 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using KeClientTracing.LogReading;
 using LogProcessors;
-using LogReader;
 using Networking;
 
 namespace LogReaderTest
@@ -15,7 +15,7 @@ namespace LogReaderTest
     class Program
     {
         private static Guid _instanceId = Guid.NewGuid();
-        private static Client _clnt;
+        private static NetClient _clnt;
         private static HashSet<string> _sessions = new HashSet<string>();
         private static AutoResetEvent _finishedReading = new AutoResetEvent(false);
         private static Stopwatch stopwatch = new Stopwatch();
@@ -37,7 +37,8 @@ namespace LogReaderTest
                 stopwatch.Start();
 
                 Console.Out.WriteLine("Begin read " + inputFile);
-                LogReaderBase lr = null;
+
+                ILogReader lr = null;
                 try
                 {
                     if (Path.GetExtension(inputFile) == ".gz")

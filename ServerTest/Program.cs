@@ -7,7 +7,6 @@ using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using LogProcessors;
-using LogReader;
 using Networking;
 using Networking.Events;
 

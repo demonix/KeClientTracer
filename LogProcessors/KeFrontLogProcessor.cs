@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using KeClientTracing.LogReading;
 using LogProcessors.Caches;
 using LogProcessors.CertificateHelper;
 using LogProcessors.TokenHelper;
-using LogReader;
 
 namespace LogProcessors
 {

@@ -1,9 +1,8 @@
-using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using ICSharpCode.SharpZipLib.GZip;
 
-namespace LogReader
+namespace KeClientTracing.LogReading
 {
     public sealed class GzWebLogReader : LogReaderBase
     {

@@ -80,6 +80,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\KeClientTracing\KeClientTracing.csproj">
+      <Project>{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}</Project>
+      <Name>KeClientTracing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LogProcessors\LogProcessors.csproj">
       <Project>{DE90DBAA-2F31-47DC-9066-33F2AD5A49F4}</Project>
       <Name>LogProcessors</Name>

@@ -9,7 +9,7 @@ using Common.ThreadSafeObjects;
 
 namespace Networking
 {
-    public class Client
+    public class NetClient
     {
         
         private Socket _localSocket;
@@ -19,7 +19,7 @@ namespace Networking
         public static AutoResetEvent _disconnectDone = new AutoResetEvent(false);
         ThreadSafeQueue<byte[]> _q = new ThreadSafeQueue<byte[]>();
 
-        public Client( IPEndPoint remoteEndPoint)
+        public NetClient( IPEndPoint remoteEndPoint)
         {
 
             _localEndPoint = new IPEndPoint(IPAddress.Any, 0);
@@ -28,7 +28,7 @@ namespace Networking
             CreateWorkerThread();
         }
 
-        public Client(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint)
+        public NetClient(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint)
         {
             _localEndPoint = localEndPoint;
             _remoteEndPoint = remoteEndPoint;
