@@ -47,7 +47,6 @@
     <Compile Include="LogReading\ILogReader.cs" />
     <Compile Include="LogReading\LineReadedEventArgs.cs" />
     <Compile Include="LogReading\LogLine.cs" />
-    <Compile Include="LogReading\LogReader.cs" />
     <Compile Include="LogReading\LogReaderBase.cs" />
     <Compile Include="LogReading\NginxLogLine.cs" />
     <Compile Include="LogReading\WebLogReader.cs" />

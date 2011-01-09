@@ -68,10 +68,6 @@
       <Project>{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}</Project>
       <Name>KeClientTracing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LogReader\LogReader.csproj">
-      <Project>{6A64719E-7034-496F-8947-F9C5113DAC3C}</Project>
-      <Name>LogReader</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

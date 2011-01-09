@@ -6,9 +6,11 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using Common.Web;
 using KeClientTracing.LogReading;
 using LogProcessors;
 using Networking;
+
 
 namespace LogReaderTest
 {
@@ -20,7 +22,7 @@ namespace LogReaderTest
         private static AutoResetEvent _finishedReading = new AutoResetEvent(false);
         private static Stopwatch stopwatch = new Stopwatch();
         private static string outPath = "";
-        
+
 
         static void Main(string[] args)
         {
@@ -28,10 +30,10 @@ namespace LogReaderTest
             TimeSpan ts = new TimeSpan();
             if (File.Exists("outPath"))
                 outPath = File.ReadAllText("outPath");
-                outPath = outPath.TrimEnd('\\');
+            outPath = outPath.TrimEnd('\\');
 
             string inputFile;
-                while (GetNextFileNameToProcess(out inputFile, args[0]))
+            while (GetNextFileNameToProcess(out inputFile, args[0]))
             {
                 stopwatch.Reset();
                 stopwatch.Start();
@@ -59,12 +61,12 @@ namespace LogReaderTest
                         WriteError(ex.ToString());
                         continue;
                     }
-                    
+
                 }
-                    catch(Exception ex)
-                    {
-                        WriteError(ex.ToString());
-                    }
+                catch (Exception ex)
+                {
+                    WriteError(ex.ToString());
+                }
                 finally
                 {
                     if (lr != null)
@@ -74,7 +76,7 @@ namespace LogReaderTest
                 Console.Out.WriteLine("Finished read {0} in {1}\r\nTotal elapsed: {2}", inputFile, stopwatch.Elapsed, ts);
             }
 
-            Console.Out.WriteLine("Finished all in "+ts);
+            Console.Out.WriteLine("Finished all in " + ts);
             CloseFileStreams();
             Console.ReadKey();
 
@@ -83,45 +85,29 @@ namespace LogReaderTest
         private static bool GetNextFileNameToProcess(out string inputFile, string serverUrl)
         {
             
-            try
-            {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serverUrl + "getnextfile");
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                using (Stream responseStream = response.GetResponseStream())
-                using (StreamReader responseStreamReader = new StreamReader(responseStream, Encoding.UTF8))
+           
+                Response response = Request.Get(serverUrl + "/getnextfile");
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    inputFile = responseStreamReader.ReadToEnd();
+                    inputFile = response.ResponseText;
+                    return true;
                 }
-                return true;
-            }
-            catch (WebException ex)
-            { 
-                if (ex.Response != null)
-                    if (((HttpWebResponse)ex.Response).StatusCode == HttpStatusCode.NotFound)
-                    {
-                        inputFile = "";
-                        return false;
-                    }
-                WriteError(ex.ToString());
-
-            }
-            catch(Exception ex)
-            {
-                WriteError(ex.ToString());
-            }
-
-            inputFile = "";
-            return false;
+                if (response.StatusCode != HttpStatusCode.NotFound)
+                {
+                    WriteError(String.Format("Error while getting next file name to process. Response code: {0}, response text: {1}",response.StatusCode,response.ResponseText));
+                }
+                    inputFile = ""; 
+                    return false;
         }
 
 
-        static Dictionary<string, FileStream> _fileStreams = new Dictionary<string, FileStream>();
+        static Dictionary<string, FileStream> _fileHandlesCache = new Dictionary<string, FileStream>();
         
-        static FileStream GetFileStream(string date)
+        static FileStream GetResultFile(string date)
         {
-            if (!_fileStreams.ContainsKey(date))
-                _fileStreams.Add(date, new FileStream(GetNextAvaliableFileName(date), FileMode.Append, FileAccess.Write, FileShare.Read));
-            return _fileStreams[date];
+            if (!_fileHandlesCache.ContainsKey(date))
+                _fileHandlesCache.Add(date, new FileStream(GetNextAvaliableFileName(date), FileMode.Append, FileAccess.Write, FileShare.Read));
+            return _fileHandlesCache[date];
         }
 
         private static string GetNextAvaliableFileName(string date)
@@ -139,7 +125,7 @@ namespace LogReaderTest
                         File.Create(fileName);
                         return fileName;
                     }
-                    catch (Exception exception)
+                    catch (Exception)
                     {
                         continue;
                     }
@@ -150,7 +136,7 @@ namespace LogReaderTest
 
         static void CloseFileStreams()
         {
-            foreach (KeyValuePair<string, FileStream> keyValuePair in _fileStreams)
+            foreach (KeyValuePair<string, FileStream> keyValuePair in _fileHandlesCache)
             {
                 keyValuePair.Value.Flush();
                 keyValuePair.Value.Close();
@@ -215,7 +201,7 @@ namespace LogReaderTest
 
                 byte[] lineB2 = Encoding.Default.GetBytes(key + "\t" + requestData + "\r\n");
                 
-                GetFileStream(meta.Split('\t')[0]).Write(lineB2, 0, lineB2.Length);    
+                GetResultFile(meta.Split('\t')[0]).Write(lineB2, 0, lineB2.Length);    
                 
                 //bf.Write(CLRF,0,2);
             }

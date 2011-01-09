@@ -82,10 +82,6 @@
       <Project>{DE90DBAA-2F31-47DC-9066-33F2AD5A49F4}</Project>
       <Name>LogProcessors</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LogReader\LogReader.csproj">
-      <Project>{6A64719E-7034-496F-8947-F9C5113DAC3C}</Project>
-      <Name>LogReader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Networking\Networking.csproj">
       <Project>{DCD91C2C-5365-4BF6-BD7F-BDD1A1626472}</Project>
       <Name>Networking</Name>
