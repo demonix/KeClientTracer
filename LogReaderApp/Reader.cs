@@ -76,7 +76,7 @@ namespace LogReaderApp
             string error;
             if (!lp.Process(e.Line, out meta, out requestData, out error))
             {
-                WriteError(error);
+                Common.Logging.Logger.WriteErrorToFile("logreader",error);
             }
  string key = meta.Replace('\t', '^');
             byte[] lineB2 = Encoding.Default.GetBytes(key + "\t" + requestData + "\r\n");

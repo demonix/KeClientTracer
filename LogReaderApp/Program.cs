@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -11,13 +12,16 @@ namespace LogReaderApp
     {
         static void Main(string[] args)
         {
-            Guid instanceId = Guid.NewGuid();
-            Reader reader = new Reader();
+            string outPath="";
+            if (File.Exists("outPath"))
+                outPath = File.ReadAllText("outPath");
+            outPath = outPath.TrimEnd('\\');
+            Reader reader = new Reader(outPath);
             
             string inputFile;
             while (GetNextFileNameToProcess(out inputFile, args[0]))
             {
-                reader.Read();
+                reader.Read(inputFile,true);
             }
 
 
@@ -33,7 +37,7 @@ namespace LogReaderApp
             }
             if (response.StatusCode != HttpStatusCode.NotFound)
             {
-                WriteError(String.Format("Error while getting next file name to process. Response code: {0}, response text: {1}", response.StatusCode, response.ResponseText));
+                Common.Logging.Logger.WriteErrorToFile("logreaderapp",String.Format("Error while getting next file name to process. Response code: {0}, response text: {1}", response.StatusCode, response.ResponseText));
             }
             inputFile = "";
             return false;
