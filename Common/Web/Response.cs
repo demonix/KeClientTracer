@@ -12,10 +12,11 @@ namespace Common.Web
         private Dictionary<string, string> _headers = new Dictionary<string, string>();
         private string _responseText;
         private HttpStatusCode _status;
-
+        private byte[] _responseData;
+        private Encoding _encoding;
         public Response(HttpWebResponse response)
         {
-            _responseText = GetHttpResponseText(response);
+            GetHttpResponseData(response);
 
             _status = response.StatusCode;
             foreach (var headerName in response.Headers.AllKeys)
@@ -28,10 +29,15 @@ namespace Common.Web
             response.Close();
             
         }
-        
+
+        public byte[] ResponseData
+        {
+            get { return _responseData; }
+        }
+
         public string ResponseText
         {
-            get { return _responseText; }
+            get { return _encoding.GetString(_responseData); }
         }
 
         public HttpStatusCode StatusCode
@@ -45,19 +51,17 @@ namespace Common.Web
         }
         
 
-        private static string GetHttpResponseText(HttpWebResponse response)
+        private void GetHttpResponseData(HttpWebResponse response)
         {
-            Encoding encoding = response.ContentEncoding.Contains("utf") ? Encoding.UTF8 : Encoding.Default;
-            
+            _encoding = response.ContentEncoding.Contains("utf") ? Encoding.UTF8 : Encoding.Default;
             Stream responseStream = response.GetResponseStream();
             if (responseStream == null)
                 throw new Exception("Cannot get response stream");
-            
-            StreamReader sr = new StreamReader(responseStream, encoding);
-            string result = sr.ReadToEnd();
-            sr.Close();
-            responseStream.Close();
-            return result;
+            if (response.ContentLength > Int32.MaxValue)
+                throw new Exception("Response size more than 2Gb is not supported yet");
+
+            _responseData = new byte[response.ContentLength];
+            responseStream.Read(_responseData, 0, (int)response.ContentLength);
         }
 
     }
