@@ -82,6 +82,7 @@
     <Compile Include="Handlers\EmptyHandler.cs" />
     <Compile Include="Handlers\HandlerBase.cs" />
     <Compile Include="Handlers\IndexHandler.cs" />
+    <Compile Include="Handlers\LogDataHandler.cs" />
     <Compile Include="Handlers\NextFileHandler.cs" />
     <Compile Include="Handlers\StatsHandlerBase.cs" />
     <Compile Include="OpLog.cs" />

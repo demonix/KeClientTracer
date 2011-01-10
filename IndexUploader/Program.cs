@@ -10,15 +10,18 @@ namespace IndexUploader
 {
     class Program
     {
-        private static string _server;
         static void Main(string[] args)
         {
-            if (args.Length !=2)
-                throw new Exception("invalid args.");
+            Settings settings = Settings.GetInstance();
+            string serviceAddress = settings.TryGetValue("LogManagerServiceAddress");
+            if (String.IsNullOrEmpty(serviceAddress))
+                throw new Exception("Log manager service address not specified");
+            string sortedLogsDirectory = settings.TryGetValue("SortedLogsDirectory");
+            if (String.IsNullOrEmpty(sortedLogsDirectory))
+                throw new Exception("Sorted logs directory not specified");
 
-            _server = args[0];
-            KeClientTracing.LogIndexing.IndexUploader indexUploader = new KeClientTracing.LogIndexing.IndexUploader(_server);
-            string[] indexFileNames = Directory.GetFiles(args[1], "*.index");
+            KeClientTracing.LogIndexing.IndexUploader indexUploader = new KeClientTracing.LogIndexing.IndexUploader(serviceAddress);
+            string[] indexFileNames = Directory.GetFiles(sortedLogsDirectory, "*.index");
             foreach (string indexFileName in indexFileNames)
                 indexUploader.Enqueue(indexFileName);
             indexUploader.StartUpload();

@@ -39,20 +39,30 @@ namespace LogManagerService.Handlers
 
         protected void MethodNotAllowed()
         {
-            WriteResponse("", HttpStatusCode.MethodNotAllowed,"");
+            WriteResponse("method not allowed", HttpStatusCode.MethodNotAllowed,"");
         }
 
-        protected void WriteResponse(string content, HttpStatusCode statusCode, string statusDescription)
+        protected void WriteResponse(byte[] content, HttpStatusCode statusCode, string statusDescription, string contentType)
         {
             HttpListenerResponse response = _httpContext.Response;
-            byte[] buffer = Encoding.UTF8.GetBytes(content);
+            response.ContentType = contentType;
             response.StatusCode = (int)statusCode;
             response.StatusDescription = statusDescription;
-            response.ContentLength64 = buffer.Length;
+            response.ContentLength64 = content.Length;
             response.ContentEncoding = Encoding.UTF8;
-            response.OutputStream.Write(buffer, 0, buffer.Length);
+            response.OutputStream.Write(content, 0, content.Length);
             response.OutputStream.Close();
             response.Close();
+        }
+
+        protected void WriteResponse(byte[] content, HttpStatusCode statusCode, string statusDescription)
+        {
+            WriteResponse(content, statusCode, statusDescription, "application/octet-stream");
+        }
+        protected void WriteResponse(string content, HttpStatusCode statusCode, string statusDescription)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(content);
+            WriteResponse(buffer,statusCode,statusDescription,"text/html");
         }
     }
 }

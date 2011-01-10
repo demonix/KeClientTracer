@@ -30,14 +30,16 @@ namespace KeClientTracing.LogIndexing
             {
                 DateTime indexDate = FileUtils.FileNameToDate(fileName);
                 string data = File.ReadAllText(fileName);
-                string uri = String.Format("{0}/index/{1}.{2}.{3}", _server, indexDate.Year.ToString("D4"),
-                                           indexDate.Month.ToString("D2"), indexDate.Day.ToString("D2"));
+                string uri = String.Format("{0}/index/?date={1}", _server, DateConversions.DateToYmd(indexDate));
                 Response response = Request.Post(uri, data);
                 if (response.StatusCode != HttpStatusCode.OK)
                     Console.WriteLine("Upload of file {0} was not succeeded. Response code is: {1}. Response text is: {2}.", fileName,
                         response.StatusCode, response.ResponseText);
                 else
+                {
+                       Console.WriteLine("File {0} was succcessfully uploaded",fileName);
                     FileUtils.ChangeExtension(fileName, "uploadedIndex", 10);
+                }
             }
         }
     }

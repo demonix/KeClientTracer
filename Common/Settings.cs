@@ -20,12 +20,12 @@ namespace Common
             return values[values.Count - 1];
         }
 
-        private Settings(string fileName,string separator, Encoding encoding)
+        private Settings(string fileName, string separator, Encoding encoding)
         {
-           _fileName = fileName;
-			_separator = separator;
-			if (!File.Exists(fileName))
-				return;
+            _fileName = fileName;
+            _separator = separator;
+            if (!File.Exists(fileName))
+                return;
             using (FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 Init(fileStream, encoding);
         }
@@ -36,7 +36,7 @@ namespace Common
             {
                 if (_instance == null)
                 {
-                    _instance = new Settings("settings\\settings",":=",Encoding.Default);
+                    _instance = new Settings("settings\\settings", ":=", Encoding.Default);
                 }
             }
             return _instance;
@@ -46,26 +46,26 @@ namespace Common
 
 
         private Settings(Stream stream, Encoding encoding, string separator)
-		{
-			this._separator = separator;
-			Init(stream, encoding);
-		}
+        {
+            this._separator = separator;
+            Init(stream, encoding);
+        }
 
-		private void Init(Stream stream, Encoding encoding)
-		{
-			using (StreamReader reader = new StreamReader(stream, encoding))
-			{
-				while (!reader.EndOfStream)
-				{
-					string line = reader.ReadLine();
-					if (IsEmpty(line)) continue;
-					KeyValuePair<string, string> keyValuePair = GetKeyAndValue(line);
-					if (!_settings.ContainsKey(keyValuePair.Key))
-						_settings.Add(keyValuePair.Key, new List<string>());
-					_settings[keyValuePair.Key].Add(keyValuePair.Value);
-				}
-			}
-		}
+        private void Init(Stream stream, Encoding encoding)
+        {
+            using (StreamReader reader = new StreamReader(stream, encoding))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+                    if (IsEmpty(line)) continue;
+                    KeyValuePair<string, string> keyValuePair = GetKeyAndValue(line);
+                    if (!_settings.ContainsKey(keyValuePair.Key))
+                        _settings.Add(keyValuePair.Key, new List<string>());
+                    _settings[keyValuePair.Key].Add(keyValuePair.Value);
+                }
+            }
+        }
 
         private KeyValuePair<string, string> GetKeyAndValue(string line)
         {
@@ -88,6 +88,19 @@ namespace Common
             string t = line.TrimStart(' ', '\t');
             return (string.IsNullOrEmpty(t)) || t.StartsWith("#");
         }
-        private readonly Dictionary<string, List<string>> _settings = new Dictionary<string, List<string>>();
+        private readonly Dictionary<string, List<string>> _settings = new Dictionary<string, List<string>>(new IgnoreCaseComparer());
+    }
+
+    internal class IgnoreCaseComparer : IEqualityComparer<string>
+    {
+        public bool Equals(string x, string y)
+        {
+            return x.Equals(y, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public int GetHashCode(string obj)
+        {
+            return obj.ToLower().GetHashCode();
+        }
     }
 }

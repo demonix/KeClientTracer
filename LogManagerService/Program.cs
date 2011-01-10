@@ -79,6 +79,9 @@ namespace LogManagerService
                 case "find":
                     new FindHandler(httpContext).Handle();
                     break;
+                case "logdata":
+                    new LogDataHandler(httpContext).Handle();
+                    break;
                 default:
                     new EmptyHandler(httpContext).Handle();
                     break;
