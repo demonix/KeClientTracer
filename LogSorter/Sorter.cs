@@ -55,15 +55,33 @@ namespace LogSorter
 
             _sortProcess = new Process();
             ProcessStartInfo psi = new ProcessStartInfo("sort.exe", GetCommandLine());
+            psi.RedirectStandardError = true;
+            psi.RedirectStandardOutput = true;
             _sortProcess.StartInfo = psi;
             _sortProcess.EnableRaisingEvents = true;
             _sortProcess.Exited += WorkingProcessExited;
+            _sortProcess.OutputDataReceived += OutputDataReceived;
+            _sortProcess.ErrorDataReceived += ErrorDataReceived;
             _sortProcess.Start();
+        }
+
+        private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (!String.IsNullOrEmpty(e.Data))
+                Console.Error.WriteLine(e.Data);
+        }
+
+        private void OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (!String.IsNullOrEmpty(e.Data))
+                Console.Out.WriteLine(e.Data);
         }
 
         private void WorkingProcessExited(object sender, EventArgs e)
         {
             string tempFolder = String.Format("\"{0}\\tmp\\{1}\"", Folder,_instanceId);
+            if (!Directory.Exists(tempFolder))
+                Directory.CreateDirectory(tempFolder);
             _semaphore.Release(1);
             foreach (string file in FileList)
                 FileUtils.ChangeExtension(file, "processedRequestData", 10);
