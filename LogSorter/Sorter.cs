@@ -19,6 +19,7 @@ namespace LogSorter
         private Semaphore _semaphore;
         private object _locker = new object();
         private bool _alreadyStarted;
+        private Guid _instanceId;
 
         public Sorter(string folder, DateTime dateOfLogs, int memory, Semaphore semaphore)
         {
@@ -27,6 +28,8 @@ namespace LogSorter
             FileList = GetFileList();
             Memory = memory;
             _semaphore = semaphore;
+            _instanceId = new Guid();
+
         }
 
         private List<string> GetFileList()
@@ -60,14 +63,21 @@ namespace LogSorter
 
         private void WorkingProcessExited(object sender, EventArgs e)
         {
+            string tempFolder = String.Format("\"{0}\\tmp\\{1}\"", Folder,_instanceId);
             _semaphore.Release(1);
             foreach (string file in FileList)
                 FileUtils.ChangeExtension(file, "processedRequestData", 10);
+            if (new DirectoryInfo(tempFolder).GetFiles().Length ==0)
+                Directory.Delete(tempFolder);
+            else
+            {
+                Console.WriteLine("sort.exe has left some files in temp folder. Command executed: {0}",GetCommandLine());
+            }
         }
 
         private string GetCommandLine()
         {
-            string tempFolder = String.Format("\"{0}\\tmp\"", Folder);
+            string tempFolder = String.Format("\"{0}\\tmp\\{1}\"", Folder,_instanceId);
             string outputFile = String.Format("{0}\\sorted\\{1}", Folder, FileUtils.DateToFileName("", DateOfLogs, "sorted"));
             StringBuilder fileListBuilder = new StringBuilder();
             foreach (string file in FileList)
