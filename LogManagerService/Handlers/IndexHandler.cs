@@ -19,7 +19,7 @@ namespace LogManagerService.Handlers
             {
                 switch (_httpContext.Request.HttpMethod.ToUpper())
                 {
-                    case "POST": PutIndex();
+                    case "POST": PostIndex();
                         break;
                     default: MethodNotAllowed();
                         break;
@@ -34,10 +34,19 @@ namespace LogManagerService.Handlers
             
         }
 
-        private void PutIndex()
+        private string _date;
+        private void PostIndex()
         {
+            _date = RequestParams("date");
+            if (String.IsNullOrEmpty(_date))
+                throw new Exception("date parameter must be specified");
+            Console.Out.WriteLine("Uploading index for " + _date);
+            Console.Out.WriteLine("Removing old data for " + _date);
             RemoveExistingIndex();
+            Console.Out.WriteLine("Old data removed for " + _date);
+            Console.Out.WriteLine("Saving new data for " + _date);
             SaveIndex();
+            Console.Out.WriteLine("New data saved for " + _date);
             WriteResponse("OK",HttpStatusCode.OK,"OK");
         }
 
@@ -76,11 +85,14 @@ namespace LogManagerService.Handlers
                                    ? DateTime.Parse(data[7]).ToUniversalTime().TimeOfDay
                                    : TimeSpan.Parse("00:00:00");
 
-                    dataDow["sessionStart"] = timeSpan;
+                    
                 }catch(Exception exception)
                 {
-                    throw new Exception("Error while reading sessionStart from string " + line + "; value "+ data[7] , exception);
+                    //throw new Exception("Error while reading sessionStart from string " + line + "; value "+ data[7] , exception);
+                    Console.Out.WriteLine("Error while reading sessionStart from string " + line + "; value " + data[7] + "\r\n" + exception);
+                    timeSpan = TimeSpan.Parse("00:00:00");
                 }
+                dataDow["sessionStart"] = timeSpan;
 
                 try
                 {
@@ -88,12 +100,15 @@ namespace LogManagerService.Handlers
                                    ? DateTime.Parse(data[8]).ToUniversalTime().TimeOfDay
                                    : TimeSpan.Parse("00:00:00");
 
-                    dataDow["sessionEnd"] = timeSpan;
+                    
                 }
                 catch (Exception exception)
                 {
-                    throw new Exception("Error while reading sessionEnd from string " + line + "; value " + data[7], exception);
+                    //throw new Exception("Error while reading sessionEnd from string " + line + "; value " + data[7], exception);
+                    Console.Out.WriteLine("Error while reading sessionEnd from string " + line + "; value " + data[7] +"\r\n"+ exception);
+                    timeSpan = TimeSpan.Parse("00:00:00");
                 }
+                dataDow["sessionEnd"] = timeSpan;
                 dataTable.Rows.Add(dataDow);
 
 
@@ -123,16 +138,18 @@ namespace LogManagerService.Handlers
 
         private void RemoveExistingIndex()
         {
+            
+           
+
             using (SqlConnection connection = new SqlConnection(Settings.WeblogIndexDbConnectionString))
             {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand( "delete from LogIndex where date = @dateToDelete", connection))
                 {
                     //command.Connection = connection;
-                    string date = RequestParams("date");
-                    if (String.IsNullOrEmpty(date))
-                        throw new Exception("date parameter must be specified");
-                    Console.Out.WriteLine("Uploading index for "+date);
+                    command.CommandTimeout = 1000;
+                    
+                    
                     string[] dateParts = RequestParams("date").Split('.');
                     DateTime dt = new DateTime(Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[2]));
                     //command.CommandText =;
