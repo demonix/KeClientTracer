@@ -12,9 +12,17 @@ namespace LogSorter
     class Program
     {
         static List<Sorter> _sorters = new List<Sorter>();
-        static Semaphore sem = new Semaphore(7, 7);
+        private const int SimultaneousProcessCount = 5;
+        private static Semaphore sem;
         static void Main(string[] args)
         {
+            int simultaneousProcessCount = 0;
+            if (args.Length != 0)
+                Int32.TryParse(args[0], out simultaneousProcessCount);
+
+            if (simultaneousProcessCount == 0)
+                simultaneousProcessCount = SimultaneousProcessCount;
+            sem = new Semaphore(simultaneousProcessCount, simultaneousProcessCount);
             string folder = "logs";
             List<DateTime> fileDates = GetFileDates(folder);
             foreach (DateTime fileDate in fileDates)
