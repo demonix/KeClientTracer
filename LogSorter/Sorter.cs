@@ -54,7 +54,8 @@ namespace LogSorter
             }
             Console.Error.WriteLine("Starting sorter for {0}", DateOfLogs);
 
-            string tempFolder = String.Format("\"{0}\\tmp\\{1}\"", Folder, _instanceId);
+            string tempFolder = String.Format("{0}\\tmp\\{1}", Folder, _instanceId);
+
             if (!Directory.Exists(tempFolder))
                 Directory.CreateDirectory(tempFolder);
 
@@ -85,7 +86,7 @@ namespace LogSorter
 
         private void WorkingProcessExited(object sender, EventArgs e)
         {
-            string tempFolder = String.Format("\"{0}\\tmp\\{1}\"", Folder,_instanceId);
+            string tempFolder = String.Format("{0}\\tmp\\{1}", Folder,_instanceId);
             _semaphore.Release(1);
             foreach (string file in FileList)
                 FileUtils.ChangeExtension(file, "processedRequestData", 10);
@@ -99,7 +100,7 @@ namespace LogSorter
 
         private string GetCommandLine()
         {
-            string tempFolder = String.Format("\"{0}\\tmp\\{1}\"", Folder,_instanceId);
+            string tempFolder = String.Format("{0}\\tmp\\{1}", Folder,_instanceId);
             string outputFile = String.Format("{0}\\sorted\\{1}", Folder, FileUtils.DateToFileName("", DateOfLogs, "sorted"));
             StringBuilder fileListBuilder = new StringBuilder();
             foreach (string file in FileList)
@@ -109,7 +110,7 @@ namespace LogSorter
             if (File.Exists(outputFile))
                 fileListBuilder.AppendFormat("\"{0}\" ", outputFile);
 
-            return String.Format("-S {0}M -T {1} -o {2} {3}", Memory, tempFolder, outputFile, fileListBuilder);
+            return String.Format("-S {0}M -T \"{1}\" -o {2} {3}", Memory, tempFolder, outputFile, fileListBuilder);
         }
 
         public void SimulateStart()
