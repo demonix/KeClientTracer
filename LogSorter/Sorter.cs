@@ -55,6 +55,7 @@ namespace LogSorter
 
             _sortProcess = new Process();
             ProcessStartInfo psi = new ProcessStartInfo("sort.exe", GetCommandLine());
+            psi.UseShellExecute = false;
             psi.RedirectStandardError = true;
             psi.RedirectStandardOutput = true;
             _sortProcess.StartInfo = psi;
@@ -67,14 +68,14 @@ namespace LogSorter
 
         private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!String.IsNullOrEmpty(e.Data))
-                Console.Error.WriteLine(e.Data);
+            //if (!String.IsNullOrEmpty(e.Data))
+                Console.Error.WriteLine("From sorter for {0}: {1}", DateOfLogs, e.Data);
         }
 
         private void OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!String.IsNullOrEmpty(e.Data))
-                Console.Out.WriteLine(e.Data);
+            //if (!String.IsNullOrEmpty(e.Data))
+                Console.Out.WriteLine("From sorter for {0}: {1}", DateOfLogs, e.Data);
         }
 
         private void WorkingProcessExited(object sender, EventArgs e)
