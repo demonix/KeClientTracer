@@ -52,10 +52,9 @@ namespace LogSorter
                     return;
                 _alreadyStarted = true;
             }
-            Console.Error.WriteLine("Starting sorter for {0}", DateOfLogs);
-
+            
             string tempFolder = String.Format("{0}\\tmp\\{1}", Folder, _instanceId);
-
+            Console.Error.WriteLine("Starting sorter for {0}, temp folder: {1}", DateOfLogs,tempFolder);
             if (!Directory.Exists(tempFolder))
                 Directory.CreateDirectory(tempFolder);
 
