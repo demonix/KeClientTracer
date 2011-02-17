@@ -28,7 +28,7 @@ namespace LogSorter
             FileList = GetFileList();
             Memory = memory;
             _semaphore = semaphore;
-            _instanceId = new Guid();
+            _instanceId = Guid.NewGuid();
 
         }
 
@@ -52,6 +52,11 @@ namespace LogSorter
                     return;
                 _alreadyStarted = true;
             }
+            Console.Error.WriteLine("Starting sorter for {0}", DateOfLogs);
+
+            string tempFolder = String.Format("\"{0}\\tmp\\{1}\"", Folder, _instanceId);
+            if (!Directory.Exists(tempFolder))
+                Directory.CreateDirectory(tempFolder);
 
             _sortProcess = new Process();
             ProcessStartInfo psi = new ProcessStartInfo("sort.exe", GetCommandLine());
@@ -81,8 +86,6 @@ namespace LogSorter
         private void WorkingProcessExited(object sender, EventArgs e)
         {
             string tempFolder = String.Format("\"{0}\\tmp\\{1}\"", Folder,_instanceId);
-            if (!Directory.Exists(tempFolder))
-                Directory.CreateDirectory(tempFolder);
             _semaphore.Release(1);
             foreach (string file in FileList)
                 FileUtils.ChangeExtension(file, "processedRequestData", 10);
