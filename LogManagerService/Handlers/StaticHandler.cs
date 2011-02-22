@@ -34,7 +34,7 @@ namespace LogManagerService.Handlers
             if (!File.Exists(fullName))
                 WriteResponse("not found",HttpStatusCode.NotFound,"not found");
             else
-                WriteResponse(File.ReadAllBytes(fullName), HttpStatusCode.NotFound, "not found");
+                WriteResponse(File.ReadAllBytes(fullName), HttpStatusCode.OK, "Ok");
         }
     }
 }
