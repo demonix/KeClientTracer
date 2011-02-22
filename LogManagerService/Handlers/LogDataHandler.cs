@@ -38,6 +38,7 @@ namespace LogManagerService.Handlers
         private void GetLogData()
         {
             Guid entryId = new Guid(RequestParams("id"));
+            string outType = HasParam("outType") ?RequestParams("outType").ToLower():"";
             DateTime date = new DateTime();
             long offset = 0;
             long length = 0;
@@ -72,13 +73,56 @@ namespace LogManagerService.Handlers
 
             }
             string file = FileUtils.DateToFileName(".\\logs\\sorted\\", date, "sorted");
+            
+            switch (outType)
+            {
+                case "simpletxt":
+                    SimpleTxtOutput(file, offset, length);
+                    break;
+                default:
+                    DefaultOutput(file, offset, length);
+                    break;
+            }
+            
+        }
+
+        private void SimpleTxtOutput(string file, long offset, long length)
+        {
+            StringBuilder sb = new StringBuilder();
+            using (Stream stream = GetOutputDataStream(file, offset, length))
+            {
+                using (StreamReader sr = new StreamReader(stream))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] split = line.Split(new[] { '\t' }, 2);
+                        if (split.Length == 2)
+                            sb.AppendFormat("{0}\r\n",split[1]);
+                    }
+                }
+            }
+            WriteResponse(Encoding.UTF8.GetBytes(sb.ToString()), HttpStatusCode.OK, "OK");
+        }
+
+        private void DefaultOutput(string file, long offset, long length)
+        {
+            using (Stream stream = GetOutputDataStream(file, offset, length))
+            {
+                WriteResponse(((MemoryStream)stream).GetBuffer(), HttpStatusCode.OK, "OK");
+            }
+        }
+
+        private Stream GetOutputDataStream(string file, long offset, long length)
+        {
+            Stream st = new MemoryStream();
             using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 fs.Seek(offset, SeekOrigin.Begin);
-                byte[] output = new byte[length];
-                fs.Read(output, 0, (int)length);
-                WriteResponse(output,HttpStatusCode.OK,"OK");
+                fs.CopyTo(st,length);
             }
+            st.Seek(0, SeekOrigin.Begin);
+            return st;
         }
     }
 }

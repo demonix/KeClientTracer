@@ -24,6 +24,10 @@ namespace LogManagerService.Handlers
         {
             return _httpContext.Request.QueryString[paramName];
         }
+        protected bool HasParam(string paramName)
+        {
+            return _httpContext.Request.QueryString[paramName] != null;
+        }
         protected string RequestPath(int routeNumber, bool throwErrorIfNotExists)
         {
             if (routeNumber == 0 || routeNumber > _requestPath.Length - 1)
@@ -40,6 +44,11 @@ namespace LogManagerService.Handlers
         protected void MethodNotAllowed()
         {
             WriteResponse("method not allowed", HttpStatusCode.MethodNotAllowed,"");
+        }
+
+        protected void BadRequest()
+        {
+            WriteResponse("badRequest", HttpStatusCode.BadRequest, "");
         }
 
         protected void WriteResponse(byte[] content, HttpStatusCode statusCode, string statusDescription, string contentType)

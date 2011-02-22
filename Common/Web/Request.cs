@@ -47,7 +47,7 @@ namespace Common.Web
         public static Response Post(string url, string postData, string referrer, string multipartId)
         {
             HttpWebRequest request = GetGenericRequest("POST", url, referrer,  multipartId);
-            request.Timeout = 1000*60*10;
+            request.Timeout = 1000*60*30;
             byte[] encodedPostData = Encoding.GetEncoding(1251).GetBytes(postData);
             request.ContentLength = encodedPostData.Length;
             Stream requestStream = request.GetRequestStream();

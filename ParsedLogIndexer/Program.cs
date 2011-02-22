@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -17,24 +18,46 @@ namespace ParsedLogIndexer
             FileInfo[] files = new DirectoryInfo(fullDirectoryPath).GetFiles("*.sorted");
             foreach (FileInfo file in files)
             {
-                string indexFileName = String.Format("{0}\\{1}.index", file.DirectoryName,
-                                                     Path.GetFileNameWithoutExtension(file.FullName));
+                string indexFileName = String.Format("{0}\\{1}.index", file.DirectoryName, Path.GetFileNameWithoutExtension(file.FullName));
+                string uploadedIndexFileName = String.Format("{0}\\{1}.uploadedIndex", file.DirectoryName, Path.GetFileNameWithoutExtension(file.FullName));
+
 
                 if (File.Exists(indexFileName))
                 {
+                    
                     FileInfo indexFileInfo = new FileInfo(indexFileName);
                     if (indexFileInfo.LastWriteTimeUtc < file.LastWriteTimeUtc)
+                    {
+                        Console.WriteLine("Index for " + Path.GetFileNameWithoutExtension(file.FullName) + " already exists, but log file is newer.");
                         File.Delete(indexFileName);
+                    }
                     else
                         continue;
                 }
 
-                using (Indexer indexer = new Indexer(file, '\t'))
+                if (File.Exists(uploadedIndexFileName))
                 {
 
+                    FileInfo uploadedIndexFileInfo = new FileInfo(uploadedIndexFileName);
+                    if (uploadedIndexFileInfo.LastWriteTimeUtc < file.LastWriteTimeUtc)
+                    {
+                        Console.WriteLine("Uploaded index for " + Path.GetFileNameWithoutExtension(file.FullName) + " already exists, but log file is newer.");
+                        File.Delete(uploadedIndexFileName);
+                    }
+                    else
+                        continue;
+                }
+
+                long i = 0;
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                using (Indexer indexer = new Indexer(file, '\t'))
+                {
+                    
                     while (indexer.ReadUpToNextKey())
                     {
-                       
+                    if (i%1000 ==0)
+                        Console.Write("\rSpeed: {0} mb/min                      ",((double)indexer.EndPosition/1024/1024)/((double)sw.ElapsedMilliseconds/100/60));   
                         try
                         {
                             string s = String.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n",
@@ -54,6 +77,7 @@ namespace ParsedLogIndexer
                         }
                     }
                 }
+                sw.Stop();
 
             }
         }
