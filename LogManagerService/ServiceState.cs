@@ -103,7 +103,7 @@ namespace LogManagerService
                             if (HashesOfPendingLogs.Items.Contains(freshRotatedLog.Hash))
                                 continue;
                             HashesOfPendingLogs.Enqueue(freshRotatedLog.Hash);
-                            OpLog.Add(freshRotatedLog.Hash);
+                            OpLog.Add(freshRotatedLog.Hash,freshRotatedLog.FileName);
                         }
                         if (freshLogs.Count > 0)
                             if (LastKnownLogHashes.ContainsKey(key))
