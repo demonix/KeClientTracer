@@ -11,8 +11,10 @@ namespace LogManagerService
         public RotatedLog(string fileName)
         {
             FileName = fileName;
+            CreationDate = File.GetCreationTimeUtc(fileName);
         }
 
+        public DateTime CreationDate { get; private set; }
         public string FileName { get; private set; }
         private string _hash;
         public string Hash

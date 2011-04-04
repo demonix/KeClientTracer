@@ -23,6 +23,7 @@ namespace LogManagerService
         {
             List<RotatedLog> orderedLogFiles = new DirectoryInfo(directory).GetFiles(mask).Select(fi => new RotatedLog(fi.FullName)).ToList();
             orderedLogFiles.RemoveAll(l => l.FileName.EndsWith(mask.TrimEnd(new[] {'*', '.'})));
+            orderedLogFiles.RemoveAll(l => new FileInfo(l.FileName).Length <= 57);
             IComparer<RotatedLog> rotatedLogFilesByOrderComparer = new CompareRotatedLogFilesByOrder();
             orderedLogFiles.Sort(rotatedLogFilesByOrderComparer);
             return orderedLogFiles;
@@ -37,7 +38,8 @@ namespace LogManagerService
         {
             int IComparer<RotatedLog>.Compare(RotatedLog fileA, RotatedLog fileB)
             {
-               return fileA.LogNumber.CompareTo(fileB.LogNumber);
+               //return fileA.LogNumber.CompareTo(fileB.LogNumber);
+                return fileB.CreationDate.Ticks.CompareTo(fileA.CreationDate.Ticks);
             }
         }
 
