@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Common.ThreadSafeObjects;
+using LogManagerService.DbLayer;
 
 namespace LogManagerService
 {
@@ -18,6 +19,7 @@ namespace LogManagerService
         public  ThreadSafeQueue<string> HashesOfPendingLogs { get; private set; }
         private static ServiceState _instance;
         private static object _instanceLocker = new object();
+        public IDb Db { get; private set; }
         Timer _tm ;
         private ServiceState()
         {

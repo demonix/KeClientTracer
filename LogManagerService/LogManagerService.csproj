@@ -78,6 +78,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DbLayer\DbBase.cs" />
+    <Compile Include="DbLayer\IDb.cs" />
+    <Compile Include="DbLayer\LogDataPlacementDescription.cs" />
+    <Compile Include="DbLayer\MongoDb.cs" />
+    <Compile Include="DbLayer\SqlServerDb.cs" />
     <Compile Include="Handlers\FindHandler.cs" />
     <Compile Include="Handlers\EmptyHandler.cs" />
     <Compile Include="Handlers\HandlerBase.cs" />

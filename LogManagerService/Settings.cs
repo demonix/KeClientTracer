@@ -7,6 +7,8 @@ namespace LogManagerService
     {
 
         public const string OpLogPath = "oplog";
+        public const string SortedLogsPath = ".\\logs\\sorted\\";
+
         public const string LastLogHashesFileName = "lastLogHashes.txt";
         public const double LogListRefreshInterval = 2*60*60;
         private static string _weblogIndexDbConnectionString;

@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Common;
+using LogManagerService.DbLayer;
 
 namespace LogManagerService.Handlers
 {
@@ -39,48 +40,22 @@ namespace LogManagerService.Handlers
         {
             Guid entryId = new Guid(RequestParams("id"));
             string outType = HasParam("outType") ?RequestParams("outType").ToLower():"";
-            DateTime date = new DateTime();
-            long offset = 0;
-            long length = 0;
-            using (SqlConnection connection = new SqlConnection(Settings.WeblogIndexDbConnectionString))
+            LogDataPlacementDescription ldpd = ServiceState.GetInstance().Db.GetLogDataPlacementDescription(entryId);
+            if (ldpd == null)
             {
-                connection.Open();
-                
-                using (SqlCommand command = new SqlCommand())
-                {
-                    command.Connection = connection;
-                    command.CommandText =
-                        @"SELECT [date], [startLogPos], [endLogPos] FROM [WeblogIndex].[dbo].[LogIndex] where id = @id";
-                    command.Parameters.Add("@id", SqlDbType.UniqueIdentifier).Value = entryId;
-
-                    SqlDataReader reader = command.ExecuteReader();
-                    
-                    if (!reader.HasRows)
-                    {
-                        WriteResponse("no such id", HttpStatusCode.NotFound, "no such id");
-                        return;
-                    }
-                    while (reader.Read())
-                    {
-                      
-                        date = reader.GetDateTime(0);
-                        offset = reader.GetInt64(1);
-                        length = reader.GetInt64(2);
-
-                    }
-                }
-
-
+                WriteResponse("no such id", HttpStatusCode.NotFound, "no such id");
+                return;
             }
-            string file = FileUtils.DateToFileName(".\\logs\\sorted\\", date, "sorted");
+            
+            string file = FileUtils.DateToFileName(Settings.SortedLogsPath, ldpd.Date, "sorted");
             
             switch (outType)
             {
                 case "simpletxt":
-                    SimpleTxtOutput(file, offset, length);
+                    SimpleTxtOutput(file, ldpd.Offset, ldpd.Length);
                     break;
                 default:
-                    DefaultOutput(file, offset, length);
+                    DefaultOutput(file, ldpd.Offset, ldpd.Length);
                     break;
             }
             
