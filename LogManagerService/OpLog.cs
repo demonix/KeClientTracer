@@ -10,7 +10,7 @@ namespace LogManagerService
         {
             lock (_opLogLocker)
             {
-                File.AppendAllText(Settings.OpLogPath, String.Format("a\t{0}\t{1}\r\n", hash, fileName));
+                File.AppendAllText(Settings.OpLogPath, String.Format("a\t{0}\t{1}\t{2}\r\n", hash, fileName, DateTime.Now));
             } 
         }
 
