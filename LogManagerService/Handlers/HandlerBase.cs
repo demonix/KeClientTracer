@@ -17,8 +17,6 @@ namespace LogManagerService.Handlers
         }
 
         public abstract void Handle();
-        
-
        
         protected string RequestParams(string paramName)
         {
@@ -37,9 +35,6 @@ namespace LogManagerService.Handlers
                     return "";
             return _requestPath[routeNumber];
         }
-
-        
-
 
         protected void MethodNotAllowed()
         {
@@ -63,7 +58,6 @@ namespace LogManagerService.Handlers
             response.OutputStream.Close();
             response.Close();
         }
-
         protected void WriteResponse(byte[] content, HttpStatusCode statusCode, string statusDescription)
         {
             WriteResponse(content, statusCode, statusDescription, "application/octet-stream");
@@ -73,5 +67,7 @@ namespace LogManagerService.Handlers
             byte[] buffer = Encoding.UTF8.GetBytes(content);
             WriteResponse(buffer,statusCode,statusDescription,"text/html");
         }
+
+      
     }
 }

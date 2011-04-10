@@ -78,13 +78,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbLayer\DbBase.cs" />
+    <Compile Include="DbLayer\ComparisonType.cs" />
+    <Compile Include="DbLayer\Condition.cs" />
     <Compile Include="DbLayer\IDb.cs" />
     <Compile Include="DbLayer\LogDataPlacementDescription.cs" />
     <Compile Include="DbLayer\MongoDb.cs" />
     <Compile Include="DbLayer\SqlServerDb.cs" />
     <Compile Include="Handlers\FindHandler.cs" />
     <Compile Include="Handlers\EmptyHandler.cs" />
+    <Compile Include="DbLayer\FindResult.cs" />
+    <Compile Include="DbLayer\FindResultEntry.cs" />
     <Compile Include="Handlers\HandlerBase.cs" />
     <Compile Include="Handlers\IndexHandler.cs" />
     <Compile Include="Handlers\LogDataHandler.cs" />

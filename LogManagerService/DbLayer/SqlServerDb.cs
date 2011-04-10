@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 
 namespace LogManagerService.DbLayer
 {
-    public class SqlServerDb : IDb
+    public class SqlServerDb :  IDb
     {
         public void RemoveIndexEntires(DateTime date)
         {
@@ -49,6 +50,67 @@ namespace LogManagerService.DbLayer
                 bulk.ColumnMappings.Add("sessionEnd", "sessionEnd");
                 bulk.BulkCopyTimeout = 100000;
                 bulk.WriteToServer(dataTable);
+            }
+        }
+
+        public FindResult Find(List<Condition> conditions)
+        {
+             FindResult results = new FindResult();
+            using (SqlConnection connection = new SqlConnection(Settings.WeblogIndexDbConnectionString))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText =
+                        @"SELECT [id] ,[date] ,[host] ,[ip] ,[inn] ,[sessionId] ,[sessionStart] ,[sessionEnd] FROM [WeblogIndex].[dbo].[LogIndex] where 1=1";
+                    foreach (Condition condition in conditions)
+                    {
+                        AddCondition(command, condition);
+                    }   
+                    command.CommandText += " order by date, host";
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Guid id = reader.GetGuid(0);
+                        DateTime date = reader.GetDateTime(1);
+                        string host = reader.GetString(2);
+                        string ip = reader.GetString(3);
+                        string inn = reader.GetString(4); ;
+                        string sessionId = reader.GetString(5); ;
+                        TimeSpan sessionStart = reader.GetTimeSpan(6);
+                        TimeSpan sessionEnd = reader.GetTimeSpan(7);
+                        results.Add(new FindResultEntry(id, date, host, ip, inn, sessionId, sessionStart, sessionEnd));
+                    }
+                }
+            }
+            return results;
+        }
+
+        private static void AddCondition(SqlCommand command, Condition condition)
+        {
+            switch (condition.Name)
+            {
+                case "datebegin":
+                    {
+                        command.CommandText += " and date >= @datebegin";
+                        command.Parameters.Add("@datebegin", SqlDbType.Date).Value = condition.Value;
+                        break;
+                    }
+
+                case "dateend":
+                    {
+                        command.CommandText += " and date <= @dateend";
+                        command.Parameters.Add("@dateend", SqlDbType.Date).Value = condition.Value;
+                        break;
+                    }
+                default:
+                    {
+                        command.CommandText += String.Format(" and {0} {1} @{0}", condition.Name,
+                                                             condition.ComparisonType == ComparisonType.Like ? "like" : "=");
+                        command.Parameters.Add(String.Format("@{0}", condition.Name), SqlDbType.VarChar).Value = condition.Value.Replace("*", "%");
+                        break;
+                    }
             }
         }
 
