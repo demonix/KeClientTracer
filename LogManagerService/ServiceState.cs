@@ -26,6 +26,7 @@ namespace LogManagerService
             AllLogs = new ThreadSafeList<RotatedLog>();
             LastKnownLogHashes = new ThreadSafeDictionary<string, string>();
             HashesOfPendingLogs = new ThreadSafeQueue<string>();
+            Db = new MongoDb();
         }
 
         private void SetupGetFilesTimer()

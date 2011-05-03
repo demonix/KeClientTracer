@@ -10,7 +10,7 @@ using Common;
 
 namespace LogSorter
 {
-    public class Sorter:ISorter
+    public class NSorter : ISorter
     {
         private Process _sortProcess;
         public DateTime DateOfLogs { get; private set; }
@@ -21,7 +21,7 @@ namespace LogSorter
         private bool _alreadyStarted;
         private Guid _instanceId;
 
-        public Sorter(string folder, DateTime dateOfLogs, int memory, Semaphore semaphore)
+        public NSorter(string folder, DateTime dateOfLogs, int memory, Semaphore semaphore)
         {
             DateOfLogs = dateOfLogs;
             Folder = folder.TrimEnd('\\');
@@ -59,7 +59,7 @@ namespace LogSorter
                 Directory.CreateDirectory(tempFolder);
 
             _sortProcess = new Process();
-            ProcessStartInfo psi = new ProcessStartInfo("sort.exe", GetCommandLine());
+            ProcessStartInfo psi = new ProcessStartInfo("nsort.exe", GetCommandLine());
             psi.UseShellExecute = false;
             psi.RedirectStandardError = true;
             psi.RedirectStandardOutput = true;
@@ -109,7 +109,7 @@ namespace LogSorter
             if (File.Exists(outputFile))
                 fileListBuilder.AppendFormat("\"{0}\" ", outputFile);
 
-            return String.Format("-S {0}M -T \"{1}\" -o {2} {3}", Memory, tempFolder, outputFile, fileListBuilder);
+            return String.Format("/REC 15000 /L C /M {0} /T \"{1}\" /O {2} {3}", Memory * 1024, tempFolder, outputFile, fileListBuilder);
         }
 
         public void SimulateStart()
@@ -120,7 +120,7 @@ namespace LogSorter
                     return;
                 _alreadyStarted = true;
             }
-            Console.Out.WriteLine("sort.exe" + GetCommandLine());
+            Console.Out.WriteLine("nsort.exe" + GetCommandLine());
             _semaphore.Release(1);
         }
     }

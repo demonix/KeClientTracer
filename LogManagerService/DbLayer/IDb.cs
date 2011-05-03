@@ -9,6 +9,6 @@ namespace LogManagerService.DbLayer
         void RemoveIndexEntires(DateTime date);
         void SaveIndexEntries(Stream stream);
         FindResult Find(List<Condition> conditions);
-        LogDataPlacementDescription GetLogDataPlacementDescription(Guid id);
+        LogDataPlacementDescription GetLogDataPlacementDescription(string entryId);
     }
 }

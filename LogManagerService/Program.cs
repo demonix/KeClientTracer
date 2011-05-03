@@ -26,7 +26,7 @@ namespace LogManagerService
 
            
             //GetFiles(null);
-            using (WebServer webServer = new WebServer("http://+:1818/logManager/"))
+            using (WebServer webServer = new WebServer("http://+:1819/logManager/"))
             {
                 ServiceState.GetInstance();
                 webServer.IncomingRequest += WebServer_IncomingRequest;

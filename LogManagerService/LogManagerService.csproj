@@ -70,6 +70,12 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\ext\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\ext\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\ext\MongoDB.Driver.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <HintPath>..\..\..\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\Profile\Client\System.Core.dll</HintPath>
@@ -111,6 +117,10 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{BB36D140-5AAB-44C4-8135-C404F514BD83}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\KeClientTracing\KeClientTracing.csproj">
+      <Project>{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}</Project>
+      <Name>KeClientTracing</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

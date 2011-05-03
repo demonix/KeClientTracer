@@ -11,7 +11,7 @@ namespace LogSorter
 {
     class Program
     {
-        static List<Sorter> _sorters = new List<Sorter>();
+        static List<ISorter> _sorters = new List<ISorter>();
         private const int SimultaneousProcessCount = 5;
         private static Semaphore sem;
         static void Main(string[] args)
@@ -19,7 +19,7 @@ namespace LogSorter
             int simultaneousProcessCount = 0;
             if (args.Length != 0)
                 Int32.TryParse(args[0], out simultaneousProcessCount);
-
+            
             if (simultaneousProcessCount == 0)
                 simultaneousProcessCount = SimultaneousProcessCount;
             sem = new Semaphore(simultaneousProcessCount, simultaneousProcessCount);
@@ -30,18 +30,23 @@ namespace LogSorter
 
                 if (fileDate < DateTime.Now.AddDays(-1))
                 {
-                    Sorter sorter = new Sorter(folder, fileDate, 200, sem);
+                    ISorter sorter;
+                    if (args.Length == 2 && args[1] == "n" || args.Length == 1 && args[0] == "n")
+                        sorter = new NSorter(folder, fileDate, 200, sem);
+                    else
+                        sorter = new Sorter(folder, fileDate, 200, sem);
+
                     _sorters.Add(sorter);
                 }
             }
 
-            foreach (Sorter sorter in _sorters)
+            foreach (ISorter sorter in _sorters)
             {
                 sem.WaitOne();
                 sorter.Start();
 
             }
-            foreach (Sorter sorter in _sorters)
+            foreach (ISorter sorter in _sorters)
                 sorter.WaitForExit();
             
         }

@@ -38,9 +38,10 @@ namespace LogManagerService.Handlers
 
         private void GetLogData()
         {
-            Guid entryId = new Guid(RequestParams("id"));
+            if (!HasParam("id") )
+                BadRequest();
             string outType = HasParam("outType") ?RequestParams("outType").ToLower():"";
-            LogDataPlacementDescription ldpd = ServiceState.GetInstance().Db.GetLogDataPlacementDescription(entryId);
+            LogDataPlacementDescription ldpd = ServiceState.GetInstance().Db.GetLogDataPlacementDescription(RequestParams("id"));
             if (ldpd == null)
             {
                 WriteResponse("no such id", HttpStatusCode.NotFound, "no such id");

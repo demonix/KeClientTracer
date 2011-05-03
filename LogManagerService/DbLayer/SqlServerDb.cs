@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using KeClientTracing.LogIndexing;
 
 namespace LogManagerService.DbLayer
 {
@@ -72,7 +73,7 @@ namespace LogManagerService.DbLayer
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Guid id = reader.GetGuid(0);
+                        string id = reader.GetGuid(0).ToString();
                         DateTime date = reader.GetDateTime(1);
                         string host = reader.GetString(2);
                         string ip = reader.GetString(3);
@@ -114,27 +115,28 @@ namespace LogManagerService.DbLayer
             }
         }
 
-        public LogDataPlacementDescription GetLogDataPlacementDescription(Guid entryId)
+        public LogDataPlacementDescription GetLogDataPlacementDescription(string entryId)
         {
             DateTime date = DateTime.MinValue;
             long offset = 0;
             long length = 0;
             using (SqlConnection connection = new SqlConnection(Settings.WeblogIndexDbConnectionString))
             {
+                Guid entryGuidId = new Guid(entryId);
+
                 connection.Open();
                 using (SqlCommand command = new SqlCommand())
                 {
                     command.Connection = connection;
                     command.CommandText =
                         @"SELECT [date], [startLogPos], [endLogPos] FROM [WeblogIndex].[dbo].[LogIndex] where id = @id";
-                    command.Parameters.Add("@id", SqlDbType.UniqueIdentifier).Value = entryId;
+                    command.Parameters.Add("@id", SqlDbType.UniqueIdentifier).Value = entryGuidId;
 
                     SqlDataReader reader = command.ExecuteReader();
 
                     if (!reader.HasRows)
-                    {
                         return null;
-                    }
+                    
                     while (reader.Read())
                     {
                         date = reader.GetDateTime(0);
@@ -151,40 +153,15 @@ namespace LogManagerService.DbLayer
         {
             string[] data = line.Split('\t');
             dataDow["id"] = Guid.NewGuid();
-            dataDow["date"] = data[0];
-            dataDow["host"] = data[1];
-            dataDow["ip"] = data[2];
-            dataDow["inn"] = data[3];
-            dataDow["sessionId"] = data[4];
-            dataDow["startLogPos"] = data[5];
-            dataDow["endLogPos"] = data[6];
-            TimeSpan timeSpan;
-            try
-            {
-                timeSpan = data.Length >= 8
-                               ? DateTime.Parse(data[7]).ToUniversalTime().TimeOfDay
-                               : TimeSpan.Parse("00:00:00");
-            }
-            catch (Exception exception)
-            {
-                Console.Out.WriteLine("Error while reading sessionStart from string " + line + "; value " + data[7] + "\r\n" + exception);
-                timeSpan = TimeSpan.Parse("00:00:00");
-            }
-
-            dataDow["sessionStart"] = timeSpan;
-
-            try
-            {
-                timeSpan = data.Length >= 9
-                               ? DateTime.Parse(data[8]).ToUniversalTime().TimeOfDay
-                               : TimeSpan.Parse("00:00:00");
-            }
-            catch (Exception exception)
-            {
-                Console.Out.WriteLine("Error while reading sessionEnd from string " + line + "; value " + data[7] + "\r\n" + exception);
-                timeSpan = TimeSpan.Parse("00:00:00");
-            }
-            dataDow["sessionEnd"] = timeSpan;
+            dataDow["date"] = IndexLineHelper.GetDate(data);
+            dataDow["host"] = IndexLineHelper.GetHost(data);
+            dataDow["ip"] = IndexLineHelper.GetIP(data);
+            dataDow["inn"] = IndexLineHelper.GetINN(data);
+            dataDow["sessionId"] = IndexLineHelper.GetSessionId(data);
+            dataDow["startLogPos"] = IndexLineHelper.GetStartLogPos(data);
+            dataDow["endLogPos"] = IndexLineHelper.GetEndLogPos(data);
+            dataDow["sessionStart"] = IndexLineHelper.GetSessionStartTime(data); 
+            dataDow["sessionEnd"] = IndexLineHelper.GetSessionEndTime(data); 
         }
 
         private DataTable CreateDataTable()

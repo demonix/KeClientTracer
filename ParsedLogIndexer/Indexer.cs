@@ -57,12 +57,17 @@ namespace ParsedLogIndexer
             FirstKeyLine = LastReadedLine;
             CurrentKey = LastReadedKey;
             StartPosition = _previousCurrentPosition;
-            
             while ((LastReadedLine = _streamReader.ReadLine()) != null)
             {
-                LastReadedKey = LastReadedLine.Split(_keyDelimiter)[0];
+                if (LastReadedKey != "" || !LastReadedLine.StartsWith(LastReadedKey))
+                {
+
+                    LastReadedKey = LastReadedLine.Substring(0, LastReadedLine.IndexOf(_keyDelimiter)); ;
+                }
+                //LastReadedKey = LastReadedLine.Split(_keyDelimiter)[0];
                 _previousCurrentPosition = _currentPosition;
                 _currentPosition += Encoding.Default.GetByteCount(LastReadedLine);
+                
                 EndPosition = _previousCurrentPosition - _lineFeedOffset;
                 
                 if (!_streamReader.EndOfStream)

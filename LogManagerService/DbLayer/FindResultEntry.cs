@@ -5,7 +5,7 @@ namespace LogManagerService.DbLayer
 {
     public class FindResultEntry
     {
-        Guid id;
+        string id;
         DateTime date;
         string host;
         string ip;
@@ -14,7 +14,7 @@ namespace LogManagerService.DbLayer
         TimeSpan sessionStart;
         TimeSpan sessionEnd;
 
-        public FindResultEntry(Guid id, DateTime date, string host, string ip, string inn, string sessionId, TimeSpan sessionStart, TimeSpan sessionEnd)
+        public FindResultEntry(string id, DateTime date, string host, string ip, string inn, string sessionId, TimeSpan sessionStart, TimeSpan sessionEnd)
         {
             this.id = id;
             this.date = date;
