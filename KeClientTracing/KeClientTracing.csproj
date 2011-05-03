@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LogIndexing\IndexLineHelper.cs" />
     <Compile Include="LogIndexing\IndexUploader.cs" />
     <Compile Include="LogReading\GzWebLogReader.cs" />
     <Compile Include="LogReading\ILogReader.cs" />
