@@ -11,7 +11,7 @@ namespace KeClientTracing.LogReading.LogDescribing
         List<UriRule> _uriRules = new List<UriRule>();
         const string DescriptionsSettingsPath = "logDescriptions.xml";
         private static DescriptionRules _dr;
-        private static object _locker;
+        private static object _locker = new object();
 
         public static DescriptionRules GetDescriptionRulesSingletone()
         {
