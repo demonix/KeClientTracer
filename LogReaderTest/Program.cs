@@ -122,7 +122,8 @@ namespace LogReaderTest
                 if (!File.Exists(fileName))
                     try
                     {
-                        File.Create(fileName);
+                        FileStream fs = File.Create(fileName);
+                        fs.Close();
                         return fileName;
                     }
                     catch (Exception)
