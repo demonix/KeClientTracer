@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rules>
+  <rule uri="login.aspx" uriMatchType="end" getDesc="Страница входа">
+    
+  </rule>
+  <rule uri="login.ashx" uriMatchType="end" getDesc="обработчик входа" postDesc="обработчик входа">
+      <parameter name="target" description="с редиректом на страницу {0}" includeValue ="true"/>
+  </rule>
+</rules>

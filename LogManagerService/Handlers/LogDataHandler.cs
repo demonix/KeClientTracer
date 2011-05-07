@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Common;
+using KeClientTracing.LogReading;
 using LogManagerService.DbLayer;
 
 namespace LogManagerService.Handlers
@@ -55,11 +56,33 @@ namespace LogManagerService.Handlers
                 case "simpletxt":
                     SimpleTxtOutput(file, ldpd.Offset, ldpd.Length);
                     break;
+                case "parsed":
+                    ParsedOutput(file, ldpd.Offset, ldpd.Length);
+                    break;
+
                 default:
                     DefaultOutput(file, ldpd.Offset, ldpd.Length);
                     break;
             }
             
+        }
+
+        private void ParsedOutput(string file, long offset, long length)
+        {
+            StringBuilder sb = new StringBuilder();
+            using (Stream stream = GetOutputDataStream(file, offset, length))
+            {
+                using (StreamReader sr = new StreamReader(stream))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        ParsedLogLine parsedLogLine = new ParsedLogLine(line);
+                        sb.AppendLine(parsedLogLine.RequestDateTime + "\t" + parsedLogLine.Method +"\t"+parsedLogLine.Uri);
+                    }
+                }
+            }
+            WriteResponse(Encoding.UTF8.GetBytes(sb.ToString()), HttpStatusCode.OK, "OK");
         }
 
         private void SimpleTxtOutput(string file, long offset, long length)
