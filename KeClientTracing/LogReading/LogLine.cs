@@ -13,7 +13,7 @@ namespace KeClientTracing.LogReading
 
         public LogLine(string line)
         {
-            SplittedLine = line.Split('\t');
+            Init(line);
         }
 
         public override string ToString()
@@ -44,8 +44,12 @@ namespace KeClientTracing.LogReading
 
         protected void FillFromString(string line)
         {
-            SplittedLine = line.Split('\t');
+            Init(line);
         }
 
+        private void Init(string line)
+        {
+            SplittedLine = line.Split('\t');
+        }
     }
 }

@@ -45,6 +45,13 @@
     <Compile Include="LogIndexing\IndexLineHelper.cs" />
     <Compile Include="LogIndexing\IndexUploader.cs" />
     <Compile Include="LogReading\GzWebLogReader.cs" />
+    <Compile Include="LogReading\LogDescribing\DescriptionRules.cs" />
+    <Compile Include="LogReading\LogDescribing\LogDescriptor.cs" />
+    <Compile Include="LogReading\LogDescribing\MatchType.cs" />
+    <Compile Include="LogReading\LogDescribing\ParameterRule.cs" />
+    <Compile Include="LogReading\LogDescribing\UriRule.cs" />
+    <Compile Include="LogReading\ParsedLogLine.cs" />
+    <Compile Include="LogReading\ParsedLogReader.cs" />
     <Compile Include="LogReading\ILogReader.cs" />
     <Compile Include="LogReading\LineReadedEventArgs.cs" />
     <Compile Include="LogReading\LogLine.cs" />
@@ -58,6 +65,9 @@
       <Project>{BB36D140-5AAB-44C4-8135-C404F514BD83}</Project>
       <Name>Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="LogReading\LogDescribing\logDescriptions.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

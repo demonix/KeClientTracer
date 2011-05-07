@@ -20,7 +20,7 @@ namespace KeClientTracing.LogReading
             get { return SplittedLine.Length > 17; }
         }
 
-        public void FillFromString(string line)
+        public new void FillFromString(string line)
         {
             base.FillFromString(line);
         }

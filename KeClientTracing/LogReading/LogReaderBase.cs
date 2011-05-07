@@ -33,6 +33,15 @@ namespace KeClientTracing.LogReading
             CreateWatcher();
         }
 
+        public LogReaderBase(Stream stream, Encoding encoding)
+        {
+            _logFileName = "undefined";
+            _logFileEncoding = encoding;
+            _currentPosition = stream.Position;
+            CreateWatcher();
+        }
+
+
         void CreateWatcher()
         {
             _watcher = new FileSystemWatcher(Path.GetDirectoryName(Path.GetFullPath(_logFileName)), Path.GetFileName(_logFileName));
