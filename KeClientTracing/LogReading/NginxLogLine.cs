@@ -20,13 +20,7 @@ namespace KeClientTracing.LogReading
             get { return SplittedLine.Length > 17; }
         }
 
-        public new void FillFromString(string line)
-        {
-            base.FillFromString(line);
-        }
-
-
-
+        
         public override DateTime RequestDateTime
         {
             get

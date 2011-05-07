@@ -16,7 +16,7 @@ namespace KeClientTracing.LogReading
             Init(line);
         }
 
-        public new void FillFromString(string line)
+        public override void FillFromString(string line)
         {
             Init(line);
         }
@@ -92,15 +92,15 @@ namespace KeClientTracing.LogReading
         }
         public override string Sid
         {
-            get { return GetField(10); }
+            get { return GetField(11); }
         }
         public override string Result
         {
-            get { return GetField(8); }
+            get { return GetField(9); }
         }
         public override string TimeTaken
         {
-            get { return GetField(9); }
+            get { return GetField(10); }
         }
         public override string SessionId
         {
@@ -112,7 +112,7 @@ namespace KeClientTracing.LogReading
         }
         public override string Backend
         {
-            get { return GetField(11); }
+            get { return GetField(12); }
         }
 
         private string GetField (int fieldNumber)

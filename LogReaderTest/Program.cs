@@ -78,7 +78,7 @@ namespace LogReaderTest
 
             Console.Out.WriteLine("Finished all in " + ts);
             CloseFileStreams();
-            Console.ReadKey();
+            //Console.ReadKey();
 
         }
 

@@ -42,7 +42,7 @@ namespace KeClientTracing.LogReading
         public abstract bool HasAllFields { get; }
 
 
-        protected void FillFromString(string line)
+        public  virtual void FillFromString(string line)
         {
             Init(line);
         }

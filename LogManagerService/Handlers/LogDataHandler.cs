@@ -4,8 +4,10 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Web;
 using Common;
 using KeClientTracing.LogReading;
+using KeClientTracing.LogReading.LogDescribing;
 using LogManagerService.DbLayer;
 
 namespace LogManagerService.Handlers
@@ -78,11 +80,27 @@ namespace LogManagerService.Handlers
                     while ((line = sr.ReadLine()) != null)
                     {
                         ParsedLogLine parsedLogLine = new ParsedLogLine(line);
-                        sb.AppendLine(parsedLogLine.RequestDateTime + "\t" + parsedLogLine.Method +"\t"+parsedLogLine.Uri);
+                        string desc = LogDescriptor.Describe(parsedLogLine.Method, parsedLogLine.Uri, parsedLogLine.QueryString);
+                        sb.AppendLine(ToTxt(parsedLogLine, desc));
                     }
+
                 }
             }
             WriteResponse(Encoding.UTF8.GetBytes(sb.ToString()), HttpStatusCode.OK, "OK");
+        }
+
+        private string ToTxt(ParsedLogLine parsedLogLine, string desc)
+        {
+            return 
+                parsedLogLine.RequestDateTime.TimeOfDay + "\t" + 
+                parsedLogLine.Method + "\t" + 
+                parsedLogLine.Host + "\t"+
+                parsedLogLine.Uri + "\t" + 
+                HttpUtility.UrlDecode(parsedLogLine.QueryString) + "\t" + 
+                parsedLogLine.Result+"\t"+
+                parsedLogLine.TimeTaken+"\t"+
+                parsedLogLine.Backend+"\t"+
+                desc;
         }
 
         private void SimpleTxtOutput(string file, long offset, long length)
