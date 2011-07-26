@@ -34,11 +34,11 @@ namespace KeClientTracing.LogReading.LogDescribing
             switch (MatchType)
             {
                 case MatchType.End:
-                    return uri.EndsWith(UriPattern);
+                    return uri.EndsWith(UriPattern,StringComparison.InvariantCultureIgnoreCase);
                 case MatchType.Begin:
-                    return uri.StartsWith(UriPattern);
+                    return uri.StartsWith(UriPattern,StringComparison.InvariantCultureIgnoreCase);
                 default:
-                    return uri.Contains(UriPattern);
+                    return uri.ToLowerInvariant().Contains(UriPattern.ToLowerInvariant());
 
             }
         }

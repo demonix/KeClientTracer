@@ -27,16 +27,11 @@ namespace LogManagerService.Handlers
         {
             string content = GetNextAlaviableFileName();
             if (String.IsNullOrEmpty(content))
-                ReturnNoFiles();
+                WriteResponse("No new files to process", HttpStatusCode.NotFound, "No new files to process");
             else
                 WriteResponse(content, HttpStatusCode.OK, "OK");
         }
-
-        private  void ReturnNoFiles()
-        {
-            WriteResponse("No new files to process", HttpStatusCode.NotFound, "No new files to process");
-        }
-
+        
         private  string GetNextAlaviableFileName()
         {
             string result = "";

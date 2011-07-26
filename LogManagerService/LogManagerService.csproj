@@ -100,7 +100,7 @@
     <Compile Include="Handlers\LogDataHandler.cs" />
     <Compile Include="Handlers\NextFileHandler.cs" />
     <Compile Include="Handlers\StaticHandler.cs" />
-    <Compile Include="Handlers\StatsHandlerBase.cs" />
+    <Compile Include="Handlers\StatsHandler.cs" />
     <Compile Include="OpLog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

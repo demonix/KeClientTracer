@@ -25,13 +25,16 @@ namespace LogManagerService.Handlers
         private void GetStaticFile()
         {
             if (!HasParam("fileName"))
+            {
                 BadRequest();
+                return;
+            }
             string fileName = RequestParams("fileName");
             string correctPath = Path.GetFullPath("static");
             string fullName = Path.GetFullPath(fileName);
             if (!fullName.StartsWith(correctPath))
                 BadRequest();
-            if (!File.Exists(fullName))
+            else if (!File.Exists(fullName))
                 WriteResponse("not found",HttpStatusCode.NotFound,"not found");
             else
                 WriteResponse(File.ReadAllBytes(fullName), HttpStatusCode.OK, "Ok");

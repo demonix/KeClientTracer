@@ -12,6 +12,7 @@ namespace KeClientTracing.LogReading.LogDescribing
         const string DescriptionsSettingsPath = "logDescriptions.xml";
         private static DescriptionRules _dr;
         private static object _locker = new object();
+        private static FileSystemWatcher _fsw;
 
         public static DescriptionRules GetDescriptionRulesSingletone()
         {
@@ -19,9 +20,23 @@ namespace KeClientTracing.LogReading.LogDescribing
                 lock (_locker)
                 {
                     if (_dr == null)
+                    {
                         _dr = DescriptionRules.Load();
+                        _fsw = new FileSystemWatcher(".",DescriptionsSettingsPath);
+                        _fsw.Changed += DescriptionsSettingsChanged;
+                        _fsw.EnableRaisingEvents = true;
+                    }
                 }
             return _dr;
+        }
+
+        private static void DescriptionsSettingsChanged(object state, FileSystemEventArgs fileSystemEventArgs)
+        {
+            Console.WriteLine("DescriptionsSettingsChanged! Reread...");
+            lock (_locker)
+            {
+                _dr = DescriptionRules.Load();
+            }
         }
 
         public static DescriptionRules Load()

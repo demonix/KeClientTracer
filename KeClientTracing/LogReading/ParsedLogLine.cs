@@ -16,6 +16,17 @@ namespace KeClientTracing.LogReading
             Init(line);
         }
 
+        public bool IsStatic ()
+        {
+            string uri = Uri;
+            return uri.EndsWith(".gif") ||
+                   uri.EndsWith(".js") ||
+                   uri.EndsWith(".css") ||
+                   uri.EndsWith(".jpg") ||
+                   uri.EndsWith(".png") ||
+                   uri.EndsWith("static.ashx");
+
+        }
         public override void FillFromString(string line)
         {
             Init(line);

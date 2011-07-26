@@ -67,7 +67,7 @@ namespace LogManagerService
             switch (requestParts[1].ToLower())
             {
                 case "stats":
-                    new StatsHandlerBase(httpContext).Handle();
+                    new StatsHandler(httpContext).Handle();
                     break;
                 case "getnextfile":
                     new NextFileHandler(httpContext).Handle();

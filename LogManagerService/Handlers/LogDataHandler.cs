@@ -42,7 +42,10 @@ namespace LogManagerService.Handlers
         private void GetLogData()
         {
             if (!HasParam("id") )
+            {
                 BadRequest();
+                return;
+            }
             string outType = HasParam("outType") ?RequestParams("outType").ToLower():"";
             LogDataPlacementDescription ldpd = ServiceState.GetInstance().Db.GetLogDataPlacementDescription(RequestParams("id"));
             if (ldpd == null)
@@ -71,6 +74,11 @@ namespace LogManagerService.Handlers
 
         private void ParsedOutput(string file, long offset, long length)
         {
+            bool showStatic = false;
+            if (HasParam("showStatic"))
+                Boolean.TryParse(RequestParams("showStatic"), out showStatic);
+                    
+
             StringBuilder sb = new StringBuilder();
             using (Stream stream = GetOutputDataStream(file, offset, length))
             {
@@ -79,14 +87,17 @@ namespace LogManagerService.Handlers
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
+                        
                         ParsedLogLine parsedLogLine = new ParsedLogLine(line);
-                        string desc = LogDescriptor.Describe(parsedLogLine.Method, parsedLogLine.Uri, parsedLogLine.QueryString);
+                        if (!showStatic && parsedLogLine.IsStatic()) continue;
+                        string desc = LogDescriptor.Describe(parsedLogLine.Method, parsedLogLine.Uri,
+                                                             parsedLogLine.QueryString);
                         sb.AppendLine(ToTxt(parsedLogLine, desc));
                     }
 
                 }
             }
-            WriteResponse(Encoding.UTF8.GetBytes(sb.ToString()), HttpStatusCode.OK, "OK");
+            WriteResponse(Encoding.UTF8.GetBytes(sb.ToString()), HttpStatusCode.OK, "OK", "text/plain; charset=utf-8");
         }
 
         private string ToTxt(ParsedLogLine parsedLogLine, string desc)

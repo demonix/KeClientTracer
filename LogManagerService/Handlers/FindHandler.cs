@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SqlClient;
 using System.Data;
+using System.Linq;
 using System.Net;
 using LogManagerService.DbLayer;
 
@@ -42,7 +43,16 @@ namespace LogManagerService.Handlers
         {
             List<Condition> conditions = Condition.Parse(_httpContext.Request.QueryString);
             if (conditions.Count == 0)
+            {
                 BadRequest();
+                return;
+            }
+            if (conditions.Any(c => c.Name == "ip" || c.Name == "inn" ||c.Name == "sessionid"))
+            {
+                WriteResponse("Filter by IP, INN or SessionId must be specified",HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
             FindResult results = ServiceState.GetInstance().Db.Find(conditions);
             
             if (results.Count() >0)
