@@ -10,12 +10,16 @@ namespace LogProcessors.CertificateHelper
 		{
 			this.organizationId = organizationId;
 			Match match = organizationIdRegex.Match(organizationId);
-			if(!match.Success)
-				throw new Exception(string.Format("'{0}' не является корректным идентификатором организации", organizationId));
+			Match matchType2 = organizationIdType2Regex.Match(organizationId);
+            if(!match.Success && !matchType2.Success)
+                throw new Exception(string.Format("'{0}' не является корректным идентификатором организации", organizationId));
 			inn = match.Groups["inn"].Value;
 			kpp = match.Groups["kpp"].Value;
-			innfl = match.Groups["innfl"].Value;
-			mriCode = match.Groups["mri"].Value;
+            if (match.Success)
+			{
+                innfl = match.Groups["innfl"].Value;
+			    mriCode = match.Groups["mri"].Value;
+            }
 		}
 
 		public ParsedOrganizationId(string inn, string kpp, string innfl)
@@ -94,6 +98,7 @@ namespace LogProcessors.CertificateHelper
 		private readonly string mriCode;
 
 		private static readonly Regex organizationIdRegex = new Regex(@"^(?<inn>\d{10}|\d{12}?)(?:-(?<kpp>\d{9}?))?(?:-(?<innfl>\d{12}?))?(?:_MRI(?<mri>\d{4}?))?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex organizationIdType2Regex = new Regex(@"^INN=(?<inn>\d{10}|\d{12}?)(?:/KPP=(?<kpp>\d{9}?))?(?:/OGRN=(?<ogrn>\d{13}?))?(?:_MRI(?<mri>\d{4}?))?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		private static readonly Regex innRegex = new Regex(@"^(?:\d{10}|\d{12})$", RegexOptions.Compiled);
 		private static readonly Regex kppRegex = new Regex(@"^\d{9}$", RegexOptions.Compiled);
 		private static readonly Regex innflRegex = new Regex(@"^\d{12}$", RegexOptions.Compiled);

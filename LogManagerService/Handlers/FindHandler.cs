@@ -34,7 +34,8 @@ namespace LogManagerService.Handlers
             }
             catch (Exception exception)
             {
-                WriteResponse(exception.ToString(), HttpStatusCode.InternalServerError, "");
+                Console.WriteLine(exception);
+                WriteResponse(exception.ToString(), HttpStatusCode.InternalServerError, "");    
                 throw;
             }
         }

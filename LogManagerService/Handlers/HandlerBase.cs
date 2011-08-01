@@ -26,6 +26,7 @@ namespace LogManagerService.Handlers
         {
             return _httpContext.Request.QueryString[paramName] != null;
         }
+        
         protected string RequestPath(int routeNumber, bool throwErrorIfNotExists)
         {
             if (routeNumber == 0 || routeNumber > _requestPath.Length - 1)
