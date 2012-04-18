@@ -146,11 +146,22 @@ namespace LogManagerService.Handlers
             Stream st = new MemoryStream();
             using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
+                //TODO: Remove this after fixing an indexer
+                OffsetHack(fs, ref offset);
                 fs.Seek(offset, SeekOrigin.Begin);
-                fs.CopyTo(st,length);
+                fs.CopyToStream(st, length);
+
             }
             st.Seek(0, SeekOrigin.Begin);
             return st;
+        }
+
+        private void OffsetHack(Stream stream, ref long offset)
+        {
+            stream.Seek(offset-1, SeekOrigin.Begin);
+            int readByte = stream.ReadByte();
+            if (readByte != 10)
+                offset = offset - 1;
         }
     }
 }

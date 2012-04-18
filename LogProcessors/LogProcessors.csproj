@@ -48,11 +48,6 @@
     <Compile Include="CertificateHelper\OrganizationCertificateDescription.cs" />
     <Compile Include="CertificateHelper\ParsedOrganizationId.cs" />
     <Compile Include="AuthRegistratorHelper\AuthRegistratorClient.cs" />
-    <Compile Include="AuthRegistratorHelper\ClientBase.cs" />
-    <Compile Include="AuthRegistratorHelper\HttpClient3.cs" />
-    <Compile Include="AuthRegistratorHelper\HttpClientBase.cs" />
-    <Compile Include="AuthRegistratorHelper\HttpResponse.cs" />
-    <Compile Include="AuthRegistratorHelper\HttpStatusCode.cs" />
     <Compile Include="KeFrontLogProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Caches\TokenCache.cs" />

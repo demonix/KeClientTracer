@@ -27,7 +27,7 @@ namespace Common
             return fileNameBuilder.ToString();
         }
 
-        public static void ChangeExtension(string file, string newExtension, int tries)
+        public static string ChangeExtension(string file, string newExtension, int tries)
         {
             for (int i = 0; i < tries; i++)
             {
@@ -35,7 +35,7 @@ namespace Common
                 destFileName = Path.ChangeExtension(file, i != 0 ? String.Format("{0}.{1}", i.ToString("D4"), newExtension) : newExtension);
                 if (File.Exists(destFileName)) continue;
                 File.Move(file, destFileName);
-                return;
+                return destFileName;
             }
             throw new Exception(String.Format("Can't change extension of file {0} to {1} after {2} tries. File with new extension already exists.", file, newExtension, tries));
         }

@@ -10,7 +10,7 @@ namespace LogProcessors.CertificateHelper
 			DistinguishedName distinguishedName = new DistinguishedName(certificate.Subject);
 			subjectName = GetValue(distinguishedName, "CN");
 			organizationName = GetValue(distinguishedName, "O");
-			organizationId = GetValue(distinguishedName, "OID.1.2.840.113549.1.9.2");
+			unstructuredName = GetValue(distinguishedName, "OID.1.2.840.113549.1.9.2");
 			email = GetValue(distinguishedName, "E");
 			owner = GetValue(distinguishedName, "SN");
 
@@ -25,14 +25,14 @@ namespace LogProcessors.CertificateHelper
 
 		internal ParsedOrganizationId ExtractParsedOrganizationId()
 		{
-			if(organizationId == "")
+			if(unstructuredName == "")
 				return null;
 			// Следующие подмены нужны, чтобы система работала с сертификатами, выданными Атласом (С-Петербург): у них в сертификатах всегда присутствует два тире
-			return new ParsedOrganizationId(organizationId.Replace("--", "-").TrimEnd('-'));
+			return new ParsedOrganizationId(unstructuredName.Replace("--", "-").TrimEnd('-'));
 		}
 
 		public string OrganizationName { get { return organizationName; } }
-		public string OrganizationId { get { return organizationId; } }
+		public string UnstructuredName { get { return unstructuredName; } }
 		public string Inn { get { return inn; } }
 		public string Kpp { get { return kpp; } }
 		public string Innfl { get { return innfl; } }
@@ -48,7 +48,7 @@ namespace LogProcessors.CertificateHelper
 		}
 
 		private readonly string organizationName;
-		private readonly string organizationId;
+		private readonly string unstructuredName;
 		private readonly string inn;
 		private readonly string kpp;
 		private readonly string innfl;

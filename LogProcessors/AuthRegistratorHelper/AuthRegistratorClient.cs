@@ -16,6 +16,31 @@ namespace LogProcessors.AuthRegistratorHelper
             }
         }
 
+        private static HttpWebResponse GetResponse(HttpWebRequest request)
+        {
+            HttpWebResponse response;
+            try
+            {
+                //System.Diagnostics.Stopwatch sw1 = new System.Diagnostics.Stopwatch();
+                //sw1.Start();
+                //response = (HttpWebResponse) request.GetResponse();
+                IAsyncResult ar = request.BeginGetResponse(null, null);
+                //ar.AsyncWaitHandle.WaitOne();
+                //Console.WriteLine(DateTime.Now + "BeforeWait: " + sw1.Elapsed);
+                response = (HttpWebResponse)request.EndGetResponse(ar);
+
+                //sw1.Stop();
+                //Console.WriteLine(DateTime.Now + "AfterWait: " + sw1.Elapsed);
+
+            }
+            catch (WebException exception)
+            {
+                if (exception.Response != null)
+                    response = (HttpWebResponse)exception.Response;
+                else throw;
+            }
+            return response;
+        }
 
         public byte[] GetCertificate(string thumbprint)
         {
@@ -27,8 +52,13 @@ namespace LogProcessors.AuthRegistratorHelper
             
             byte[] result;
             byte[] buffer = new byte[4096];
-            using (WebResponse response = httpWebRequest.GetResponse())
+            using (HttpWebResponse response = GetResponse(httpWebRequest))
             {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    return null;
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception("Response code: " + response.StatusCode+"\r\nText: "+new StreamReader(response.GetResponseStream()).ReadToEnd());
+
                 using (Stream responseStream = response.GetResponseStream())
                 {
                     using (MemoryStream memoryStream = new MemoryStream())

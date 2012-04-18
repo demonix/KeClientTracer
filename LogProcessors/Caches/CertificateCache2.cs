@@ -15,11 +15,11 @@ namespace LogProcessors.Caches
             OrganizationCertificateDescription result = (OrganizationCertificateDescription)HttpRuntime.Cache[thumbprint];
             if (result == null)
             {
-
-                result = new OrganizationCertificateDescription(new X509Certificate(arClient.GetCertificate(thumbprint)));
-
-                if (result != null)
-                    HttpRuntime.Cache.Add(thumbprint, result, null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(30), CacheItemPriority.Normal, null);
+                byte[] certificateData = arClient.GetCertificate(thumbprint);
+                if (certificateData == null)
+                    return null;
+                result = new OrganizationCertificateDescription(new X509Certificate(certificateData));
+                HttpRuntime.Cache.Add(thumbprint, result, null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(30), CacheItemPriority.Normal, null);
             }
 
             return result;

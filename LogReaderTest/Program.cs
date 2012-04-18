@@ -28,12 +28,13 @@ namespace LogReaderTest
         {
             Console.Out.WriteLine("InstanceId: {0}", _instanceId);
             TimeSpan ts = new TimeSpan();
+            outPath = "out";
             if (File.Exists("outPath"))
                 outPath = File.ReadAllText("outPath");
             outPath = outPath.TrimEnd('\\');
 
             string inputFile;
-            while (GetNextFileNameToProcess(out inputFile, args[0]))
+            while (GetNextFileNameToProcess(args, out inputFile))
             {
                 stopwatch.Reset();
                 stopwatch.Start();
@@ -82,11 +83,29 @@ namespace LogReaderTest
 
         }
 
-        private static bool GetNextFileNameToProcess(out string inputFile, string serverUrl)
+        private static int _fileNumberInCommandLine;
+        private static bool GetNextFileNameToProcess(string[] args, out string inputFile)
         {
-            
-           
-                Response response = Request.Get(serverUrl + "/getnextfile");
+            inputFile = "";
+            if (args.Length < 2)
+                return false;
+
+            if (args[0] == "-f")
+                return GetFromCommandLine(args, Interlocked.Increment(ref _fileNumberInCommandLine), out inputFile);
+            if (args[0] == "-w")
+                return GetFromWebService(args, out inputFile);
+
+            return false;
+        }
+
+        private static bool GetFromWebService(string[] args, out string inputFile)
+        {
+            inputFile = "";
+            string serverUrl = args[1];
+            Response response;
+            try
+            {
+                response = Request.Get(serverUrl + "/getnextfile");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     inputFile = response.ResponseText;
@@ -94,10 +113,35 @@ namespace LogReaderTest
                 }
                 if (response.StatusCode != HttpStatusCode.NotFound)
                 {
-                    WriteError(String.Format("Error while getting next file name to process. Response code: {0}, response text: {1}",response.StatusCode,response.ResponseText));
+                    WriteError(
+                        String.Format(
+                            "Error while getting next file name to process. Response code: {0}, response text: {1}",
+                            response.StatusCode, response.ResponseText));
                 }
-                    inputFile = ""; 
-                    return false;
+
+            }
+            catch (WebException ex)
+            {
+                WriteError(String.Format("Error while getting next file name to process. Error {0}", ex));
+            }
+
+            return false;
+        }
+
+        private static bool GetFromCommandLine(string[] args, int position, out string inputFile)
+        {
+            inputFile = "";
+            if (position + 1 > args.Length)
+                return false;
+            
+            try
+            {inputFile = args[position];}
+            catch(Exception)
+            {
+                Console.WriteLine("position = " +position);
+                throw;
+            }
+            return true;
         }
 
 

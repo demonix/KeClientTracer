@@ -62,7 +62,7 @@ namespace ParsedLogIndexer
                 if (LastReadedKey != "" || !LastReadedLine.StartsWith(LastReadedKey))
                 {
 
-                    LastReadedKey = LastReadedLine.Substring(0, LastReadedLine.IndexOf(_keyDelimiter)); ;
+                    LastReadedKey = LastReadedLine.Substring(0, LastReadedLine.IndexOf(_keyDelimiter));
                 }
                 //LastReadedKey = LastReadedLine.Split(_keyDelimiter)[0];
                 _previousCurrentPosition = _currentPosition;
@@ -72,6 +72,7 @@ namespace ParsedLogIndexer
                 
                 if (!_streamReader.EndOfStream)
                 {
+                    //TODO: this is wrong. Peek() returns first byte of te next line
                     _lineFeedOffset = _streamReader.Peek() != 10 ? 2 : 1;
                     _currentPosition += _lineFeedOffset;
                 }

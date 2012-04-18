@@ -32,9 +32,9 @@ namespace LogSorter
                 {
                     ISorter sorter;
                     if (args.Length == 2 && args[1] == "n" || args.Length == 1 && args[0] == "n")
-                        sorter = new NSorter(folder, fileDate, 200, sem);
+                        sorter = new NSorter(folder, fileDate, 500, sem);
                     else
-                        sorter = new Sorter(folder, fileDate, 200, sem);
+                        sorter = new Sorter(folder, fileDate, 500, sem);
 
                     _sorters.Add(sorter);
                 }

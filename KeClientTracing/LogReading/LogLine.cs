@@ -6,15 +6,16 @@ namespace KeClientTracing.LogReading
     public abstract class LogLine
     {
         internal string[] SplittedLine;
-
+        internal string Line ="";
         public LogLine()
         {
         }
 
-        public LogLine(string line)
+        /*public LogLine(string line)
         {
-            Init(line);
+            Parse(line);
         }
+        */
 
         public override string ToString()
         {
@@ -44,11 +45,12 @@ namespace KeClientTracing.LogReading
 
         public  virtual void FillFromString(string line)
         {
-            Init(line);
+            Parse(line);
         }
 
-        private void Init(string line)
+        private void Parse(string line)
         {
+            Line = line;
             SplittedLine = line.Split('\t');
         }
     }

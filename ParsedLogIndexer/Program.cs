@@ -81,7 +81,7 @@ namespace ParsedLogIndexer
 
             }
         }
-        static void OldMain(string[] args)
+     /*   static void OldMain(string[] args)
         {
             string fullDirectoryPath = Path.GetFullPath(args[0]);
 
@@ -158,12 +158,12 @@ namespace ParsedLogIndexer
                 }
             }
         }
-
-        private static void WriteIndexEntry(string indexFileName, string key, long position, long length, string startTime, string endTime)
+        */
+      /*  private static void WriteIndexEntry(string indexFileName, string key, long position, long length, string startTime, string endTime)
         {
             File.AppendAllText(indexFileName, key.Replace("^", "\t") + "\t" + position + "\t" + length + "\t" + startTime + "\t" + endTime + "\r\n");
         }
-
+        */
         private static void WriteIndexEntry(string indexFileName,string data)
         {
             File.AppendAllText(indexFileName, data);
