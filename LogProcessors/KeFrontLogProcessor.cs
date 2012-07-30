@@ -22,7 +22,7 @@ namespace LogProcessors
             nginxLogLine.FillFromString(line);
             if (!nginxLogLine.HasAllFields)
             {
-                error = "log line [\""+ line + "\"] in not correct "+ nginxLogLine.GetType().Name;
+                error = "log line [\""+ line + "\"] is not correct "+ nginxLogLine.GetType().Name;
                 return false;
             }
 

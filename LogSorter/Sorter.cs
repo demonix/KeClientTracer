@@ -44,6 +44,8 @@ namespace LogSorter
             _sortProcess.WaitForExit();
         }
 
+        public event EventHandler Finished;
+
         public void Start()
         {
             lock (_locker)

@@ -13,7 +13,7 @@ namespace LogSorter
     {
         static List<ISorter> _sorters = new List<ISorter>();
         private const int SimultaneousProcessCount = 5;
-        private static Semaphore sem;
+        private static Semaphore _sem;
         static void Main(string[] args)
         {
             int simultaneousProcessCount = 0;
@@ -22,7 +22,7 @@ namespace LogSorter
             
             if (simultaneousProcessCount == 0)
                 simultaneousProcessCount = SimultaneousProcessCount;
-            sem = new Semaphore(simultaneousProcessCount, simultaneousProcessCount);
+            _sem = new Semaphore(simultaneousProcessCount, simultaneousProcessCount);
             string folder = "logs";
             List<DateTime> fileDates = GetFileDates(folder);
             foreach (DateTime fileDate in fileDates)
@@ -32,26 +32,29 @@ namespace LogSorter
                 {
                     ISorter sorter;
                     if (args.Length == 2 && args[1] == "n" || args.Length == 1 && args[0] == "n")
-                        sorter = new NSorter(folder, fileDate, 500, sem);
+                        sorter = new NSorter(folder, fileDate, 500);
                     else
-                        sorter = new Sorter(folder, fileDate, 500, sem);
-
+                        sorter = new Sorter(folder, fileDate, 500, _sem);
+                    sorter.Finished+=SorterFinished;
                     _sorters.Add(sorter);
                 }
             }
 
             foreach (ISorter sorter in _sorters)
             {
-                sem.WaitOne();
+                _sem.WaitOne();
                 sorter.Start();
-
             }
             foreach (ISorter sorter in _sorters)
                 sorter.WaitForExit();
-            
         }
 
-       
+        private static void SorterFinished(object sender, EventArgs e)
+        {
+            _sem.Release(1);
+        }
+
+
         static List<DateTime> GetFileDates(string folderPath)
         {
             List<DateTime> result = new List<DateTime>();

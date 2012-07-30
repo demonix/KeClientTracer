@@ -74,14 +74,17 @@ namespace LogManagerService.DbLayer
 
         private MongoCollection<BsonDocument> GetMongoCollection()
         {
-            MongoConnectionStringBuilder builder = new MongoConnectionStringBuilder();
-            builder.SocketTimeout = new TimeSpan(0,30,0);
-            builder.Server = new MongoServerAddress("127.0.0.1");
-            MongoServer server = MongoServer.Create(builder); // connect to localhost
+            string[] connstring = File.ReadAllLines(@"\settings\WeblogIndexMongoDbConnectionString");
+            MongoUrlBuilder builder = new MongoUrlBuilder(connstring[0]);
+            builder.SocketTimeout = new TimeSpan(0, 30, 0);
+            //builder.Server = port.HasValue ? new MongoServerAddress(host, port.Value) : new MongoServerAddress(host);
+            MongoServer server = MongoServer.Create(builder.ToServerSettings());
             server.Connect();
             MongoDatabase webLogIndex = server.GetDatabase("WebLogIndex");
             return webLogIndex.GetCollection("Items");
         }
+
+
 
         private IMongoQuery BuildQuery(Dictionary<string, QueryBuilder> queryBuilder)
         {
