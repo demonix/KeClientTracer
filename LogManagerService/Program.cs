@@ -28,7 +28,7 @@ namespace LogManagerService
             //GetFiles(null);
             using (WebServer webServer = new WebServer("http://+:1819/logManager/"))
             {
-                ServiceState.GetInstance();
+                ServiceState.Init();
                 webServer.IncomingRequest += WebServer_IncomingRequest;
                 webServer.Start();
                 Console.WriteLine("WebServer started. Press any key to exit.");

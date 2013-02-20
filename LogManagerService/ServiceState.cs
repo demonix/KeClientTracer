@@ -17,6 +17,7 @@ namespace LogManagerService
         public ThreadSafeDictionary<string, string> LastKnownLogHashes { get; private set; }
         //private static Queue<string> _pendingLogHashes = new Queue<string>();
         public  ThreadSafeQueue<string> HashesOfPendingLogs { get; private set; }
+        public ThreadSafeList<string> AllHashes { get; private set; }
         private static ServiceState _instance;
         private static object _instanceLocker = new object();
         public IDb Db { get; private set; }
@@ -26,6 +27,7 @@ namespace LogManagerService
             AllLogs = new ThreadSafeList<RotatedLog>();
             LastKnownLogHashes = new ThreadSafeDictionary<string, string>();
             HashesOfPendingLogs = new ThreadSafeQueue<string>();
+            AllHashes = new ThreadSafeList<string>();
             Db = new MongoDb();
         }
 
@@ -34,36 +36,49 @@ namespace LogManagerService
             _tm = new Timer(GetFiles, null, TimeSpan.FromMilliseconds(0), TimeSpan.FromSeconds(Settings.LogListRefreshInterval));
         }
 
+        public static void Init()
+        {
+            _instance = new ServiceState();
+            _instance.LoadLastLogHashes();
+            _instance.ProcessOpLog();
+            _instance.SetupGetFilesTimer();
+        }
+
         public static ServiceState GetInstance()
         {
-            lock (_instanceLocker)
-            {
-                if (_instance == null)
+            if (_instance == null)
+                lock (_instanceLocker)
                 {
-                    _instance = new ServiceState();
-                    _instance.LoadLastLogHashes();
-                    _instance.ProcessOpLog();
-                    _instance.SetupGetFilesTimer();
+                    if (_instance == null)
+                    {
+                        Init();
+                    }
                 }
-            }
-           return _instance;
+            return _instance;
         }
 
         private void ProcessOpLog()
         {
+            Console.Out.WriteLine("Begin processing oplog...");
             if (!File.Exists(Settings.OpLogPath)) return;
             string[] oplogFile = File.ReadAllLines(Settings.OpLogPath);
             List<string> hashesOfNotYetProcessedLogs = new List<string>();
 
             foreach (string oplogLine in oplogFile)
             {
+                var hash = oplogLine.Split('\t')[1];
+
+                if (!AllHashes.GetSnapshot().Contains(hash))
+                    AllHashes.Add(hash);
+
                 if (oplogLine[0] == 'r')
-                    hashesOfNotYetProcessedLogs.Remove(oplogLine.Split('\t')[1]);
+                    hashesOfNotYetProcessedLogs.Remove(hash);
                 if (oplogLine[0] == 'a')
-                    hashesOfNotYetProcessedLogs.Add(oplogLine.Split('\t')[1]);
+                    hashesOfNotYetProcessedLogs.Add(hash);
             }
                 ServiceState.GetInstance().HashesOfPendingLogs.EnqueueMany(hashesOfNotYetProcessedLogs);
                 //_pendingLogHashes.Enqueue(hash);
+           Console.Out.WriteLine("Finished processing oplog...");
         }
 
         private void GetFiles(object state)
@@ -103,7 +118,7 @@ namespace LogManagerService
 
                         foreach (RotatedLog freshRotatedLog in freshLogs)
                         {
-                            if (HashesOfPendingLogs.Items.Contains(freshRotatedLog.Hash))
+                            if (HashesOfPendingLogs.Items.Contains(freshRotatedLog.Hash) || AllHashes.GetSnapshot().Contains(freshRotatedLog.Hash))
                                 continue;
                             HashesOfPendingLogs.Enqueue(freshRotatedLog.Hash);
                             OpLog.Add(freshRotatedLog.Hash,freshRotatedLog.FileName);

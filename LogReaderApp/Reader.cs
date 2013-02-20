@@ -53,7 +53,8 @@ namespace LogReaderApp
                     lr.BeginRead();
                     _finishedReading.WaitOne();
 
-            }
+            }catch (Exception exception)
+            {    Logger.WriteErrorToFile("FATAL","error while reading file"+_logFileName+"\r\n"+exception);}
             finally
             {
                 if (lr != null)
