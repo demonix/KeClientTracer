@@ -29,7 +29,16 @@ namespace LogManagerService
 
         public static string ComputeHash(string filename)
         {
-            return filename.EndsWith("gz") ? ComputeHashFromGz(filename) : ComputeHashFromTxt(filename);
+            try
+            {
+                var hash = filename.EndsWith("gz") ? ComputeHashFromGz(filename) : ComputeHashFromTxt(filename);
+                return hash;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("error in ComputeHash for " + filename );
+                throw;
+            }
         }
 
         
@@ -49,12 +58,15 @@ namespace LogManagerService
         private static string ComputeHashFromGz(string filename)
         {
             string newHash;
-            using (GZipInputStream logFileStream = new GZipInputStream(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (FileStream fileStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-                byte[] headBytes = new byte[BytesToRead];
-                logFileStream.Read(headBytes, 0, BytesToRead);
-                SHA1 sha1 = SHA1.Create();
-                newHash = BitConverter.ToString(sha1.ComputeHash(headBytes));
+                using (GZipInputStream logFileStream = new GZipInputStream(fileStream))
+                {
+                    byte[] headBytes = new byte[BytesToRead];
+                    logFileStream.Read(headBytes, 0, BytesToRead);
+                    SHA1 sha1 = SHA1.Create();
+                    newHash = BitConverter.ToString(sha1.ComputeHash(headBytes));
+                }
             }
             return newHash;
         }
