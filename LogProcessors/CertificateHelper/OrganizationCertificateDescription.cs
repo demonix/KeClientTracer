@@ -15,15 +15,14 @@ namespace LogProcessors.CertificateHelper
 			owner = GetValue(distinguishedName, "SN");
 
 			certificateContent = certificate.GetRawCertData();
-
-			ParsedOrganizationId parsedOrganizationId = ExtractParsedOrganizationId();
-			inn = parsedOrganizationId != null ? parsedOrganizationId.Inn : "";
-			kpp = parsedOrganizationId != null ? parsedOrganizationId.Kpp : "";
-			innfl = parsedOrganizationId != null ? parsedOrganizationId.Innfl : "";
+            //ParsedOrganizationId parsedOrganizationId = ExtractParsedOrganizationId();
+			//inn = parsedOrganizationId != null ? parsedOrganizationId.Inn : "";
+			//kpp = parsedOrganizationId != null ? parsedOrganizationId.Kpp : "";
+			//innfl = parsedOrganizationId != null ? parsedOrganizationId.Innfl : "";
 		}
 
 
-		internal ParsedOrganizationId ExtractParsedOrganizationId()
+		private ParsedOrganizationId ExtractParsedOrganizationId()
 		{
 			if(unstructuredName == "")
 				return null;
@@ -33,9 +32,9 @@ namespace LogProcessors.CertificateHelper
 
 		public string OrganizationName { get { return organizationName; } }
 		public string UnstructuredName { get { return unstructuredName; } }
-		public string Inn { get { return inn; } }
-		public string Kpp { get { return kpp; } }
-		public string Innfl { get { return innfl; } }
+		//public string Inn { get { return inn; } }
+		//public string Kpp { get { return kpp; } }
+		//public string Innfl { get { return innfl; } }
 		public string Owner { get { return owner; } }
 		public string Email { get { return email; } }
 	    public string SubjectName { get { return subjectName; } }
