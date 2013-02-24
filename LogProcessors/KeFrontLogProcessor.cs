@@ -54,9 +54,9 @@ namespace LogProcessors
                 }
 
             //meta = token == null? "" : token.User.ToString();
-            meta = String.Format("{0:dd.MM.yyyy}\t{1}",nginxLogLine.RequestDateTime.ToLocalTime(), ocd == null ? "" : ocd.UnstructuredName);
+           /* meta = String.Format("{0:dd.MM.yyyy}\t{1}",nginxLogLine.RequestDateTime.ToLocalTime(), ocd == null ? "" : ocd.UnstructuredName);
             requestData = nginxLogLine.UserAgent;
-            return result;
+            return result;*/
             meta = String.Format("{0:dd.MM.yyyy}\t{1}\t{2}\t{3}\t{4}",
                                          nginxLogLine.RequestDateTime.ToLocalTime(),
                                          nginxLogLine.Host,
@@ -66,7 +66,7 @@ namespace LogProcessors
 
             requestData =
                 String.Format(
-                    //"{0:dd.MM.yyyy H:mm:ss.fff zzz}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
+                  //"{0:dd.MM.yyyy H:mm:ss.fff zzz}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
                     "{0:HH:mm:ss.fff K}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
                     nginxLogLine.RequestDateTime.ToLocalTime(),
                     nginxLogLine.Method,
