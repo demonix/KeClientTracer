@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Linq.Expressions;
 using KeClientTracing.LogIndexing;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -13,15 +17,20 @@ namespace LogManagerService.DbLayer
     {
         public void RemoveIndexEntires(DateTime date)
         {
-            MongoCollection<BsonDocument> items = GetMongoCollection();
+            MongoCollection<BsonDocument> items = GetItemsMongoCollection();
             var query = Query.EQ("date",  DateTime.SpecifyKind(date, DateTimeKind.Utc));
             SafeModeResult smr = items.Remove(query,SafeMode.True);
-            Console.WriteLine(smr.DocumentsAffected + " entries deleted");
+            Console.WriteLine(smr.DocumentsAffected + " entries deleted from generic collection");
+            MongoCollection<BsonDocument> itemsPerDate = GetMongoCollectionForDate(date);
+            if (itemsPerDate != null)
+                itemsPerDate.Drop();
         }
 
-        public void SaveIndexEntries(Stream stream)
+        public void SaveIndexEntries(DateTime date, Stream stream)
         {
-            MongoCollection<BsonDocument> items = GetMongoCollection();
+            MongoCollection<BsonDocument> items = GetMongoCollectionForDate(date);
+            items.EnsureIndex(IndexKeys.Ascending("inn"));
+
             StreamReader streamReader = new StreamReader(stream);
             string line;
             List<BsonDocument> batch = new List<BsonDocument>();
@@ -46,33 +55,73 @@ namespace LogManagerService.DbLayer
 
         public FindResult Find(List<Condition> conditions)
         {
-            FindResult results = new FindResult();
-            MongoCollection<BsonDocument> items = GetMongoCollection();
+
             Dictionary<string, QueryBuilder> queryBuilder = new Dictionary<string, QueryBuilder>();
             foreach (Condition condition in conditions)
             {
                 AddCondition(queryBuilder, condition);
             }
+            var from =
+                DateTime.SpecifyKind(
+                    DateTime.Parse(
+                        conditions.Where(c => c.Name == "datebegin")
+                                  .Select(c => c.Value)
+                                  .DefaultIfEmpty("01.01.2010")
+                                  .First()), DateTimeKind.Utc);
+            var to =
+                DateTime.SpecifyKind(
+                    DateTime.Parse(
+                        conditions.Where(c => c.Name == "dateend")
+                                  .Select(c => c.Value)
+                                  .DefaultIfEmpty(DateTime.Now.Date.ToString(CultureInfo.InvariantCulture))
+                                  .First()), DateTimeKind.Utc);
+
+            var days = Enumerable.Range(0, (int)Math.Floor((to - from).TotalDays)).ToList();
             IMongoQuery completeQuery = BuildQuery(queryBuilder);
-            var queryResult = items.Find(completeQuery);
-            
-            foreach (BsonDocument bsonDocument in queryResult)
-            {
-                //Guid id = new Guid(bsonDocument["_id"].AsObjectId + "00000000");
-                string id = bsonDocument["_id"].AsObjectId.ToString();
-                DateTime date = bsonDocument["date"].AsDateTime;
-                string host = bsonDocument["host"].AsString;
-                string ip = bsonDocument["ip"].AsString;
-                string inn = bsonDocument["inn"].AsString ;
-                string sessionId = bsonDocument["sessionId"].AsString ;
-                TimeSpan sessionStart = new TimeSpan(bsonDocument["sessionStart"].AsInt64);
-                TimeSpan sessionEnd = new TimeSpan(bsonDocument["sessionEnd"].AsInt64);
-                results.Add(new FindResultEntry(id, date, host, ip, inn, sessionId, sessionStart, sessionEnd));
-            }
-            return results;
+            var tasks = new Task<List<FindResultEntry>>[days.Count];
+            days.ForEach(d =>
+                {
+                    var localD = d;
+                    tasks[localD] = Task<List<FindResultEntry>>.Factory.StartNew(() =>
+                    {
+                        MongoCollection<BsonDocument> items = GetMongoCollectionForDate(from.AddDays(localD));
+                        List<FindResultEntry> results = new List<FindResultEntry>();
+                        if (items == null)
+                            return results;
+                        var found = items.Find(completeQuery);
+
+                        foreach (BsonDocument bsonDocument in found)
+                        {
+                            //Guid id = new Guid(bsonDocument["_id"].AsObjectId + "00000000");
+                            string id = bsonDocument["_id"].AsObjectId.ToString();
+                            DateTime date = bsonDocument["date"].AsDateTime;
+                            string host = bsonDocument["host"].AsString;
+                            string ip = bsonDocument["ip"].AsString;
+                            string inn = bsonDocument["inn"].AsString;
+                            string sessionId = bsonDocument["sessionId"].AsString;
+                            TimeSpan sessionStart = new TimeSpan(bsonDocument["sessionStart"].AsInt64);
+                            TimeSpan sessionEnd = new TimeSpan(bsonDocument["sessionEnd"].AsInt64);
+                            results.Add(new FindResultEntry(id, date, host, ip, inn, sessionId, sessionStart, sessionEnd));
+                        }
+                        return results;
+                    });
+                }
+                    );
+            Task.WaitAll(tasks);
+            return new FindResult(tasks.SelectMany(t => t.Result).ToList());
         }
 
-        private MongoCollection<BsonDocument> GetMongoCollection()
+        private MongoCollection<BsonDocument> GetItemsMongoCollection()
+        {
+            return GetMongoCollection("Items");
+        }
+
+        private MongoCollection<BsonDocument> GetMongoCollectionForDate(DateTime date)
+        {
+            return GetMongoCollection(String.Format("{0:0000}{1:00}{2:00}", date.Year, date.Month, date.Day));
+        }
+
+        private MongoCollection<BsonDocument> GetMongoCollection(string collectionName, bool create = false)
         {
             string[] connstring = File.ReadAllLines(@"settings\WeblogIndexMongoDbConnectionString");
             MongoUrlBuilder builder = new MongoUrlBuilder(connstring[0]);
@@ -81,14 +130,15 @@ namespace LogManagerService.DbLayer
             MongoServer server = MongoServer.Create(builder.ToServerSettings());
             server.Connect();
             MongoDatabase webLogIndex = server.GetDatabase("WebLogIndex");
-            return webLogIndex.GetCollection("Items");
+            if (webLogIndex.CollectionExists(collectionName) || create)
+                return webLogIndex.GetCollection(collectionName);
+            return null;
         }
 
 
 
         private IMongoQuery BuildQuery(Dictionary<string, QueryBuilder> queryBuilder)
         {
-            
             queryBuilder.Remove("datebegin");
             queryBuilder.Remove("dateend");
             List<QueryComplete> conditionList = new List<QueryComplete>();
@@ -168,7 +218,7 @@ namespace LogManagerService.DbLayer
             long offset = 0;
             long length = 0;
             //string entryIdStr = entryId.ToString();//.Replace("-", "").Remove(24);
-            MongoCollection<BsonDocument> items = GetMongoCollection();
+            MongoCollection<BsonDocument> items = GetItemsMongoCollection();
             IMongoQuery query = Query.EQ("_id", new BsonObjectId(entryId));
             var doc = items.Find(query);
             if (doc.Count() == 0)

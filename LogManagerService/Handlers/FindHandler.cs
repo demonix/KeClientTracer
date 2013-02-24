@@ -48,6 +48,11 @@ namespace LogManagerService.Handlers
                 BadRequest();
                 return;
             }
+            if (!conditions.Any(c => c.Name == "datebegin" || c.Name == "dateend"))
+            {
+                WriteResponse("Filter by date must be specified", HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
             if (!conditions.Any(c => c.Name == "ip" || c.Name == "inn" ||c.Name == "sessionid"))
             {
                 WriteResponse("Filter by IP, INN or SessionId must be specified",HttpStatusCode.BadRequest, "Bad request");

@@ -34,10 +34,11 @@ namespace LogManagerService.Handlers
             
         }
 
-        private string _date;
+        
         private void PostIndex()
         {
-            _date = RequestParams("date");
+            
+            var _date = RequestParams("date");
             if (String.IsNullOrEmpty(_date))
                 throw new Exception("date parameter must be specified");
             Console.Out.WriteLine(DateTime.Now + ": uploading index for " + _date);
@@ -52,7 +53,9 @@ namespace LogManagerService.Handlers
 
         private void SaveIndex()
         {
-            ServiceState.GetInstance().Db.SaveIndexEntries(_httpContext.Request.InputStream);
+            string[] dateParts = RequestParams("date").Split('.');
+            DateTime date = new DateTime(Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[2]));
+            ServiceState.GetInstance().Db.SaveIndexEntries(date, _httpContext.Request.InputStream);
         }
 
 

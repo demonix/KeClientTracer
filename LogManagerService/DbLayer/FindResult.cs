@@ -8,6 +8,13 @@ namespace LogManagerService.DbLayer
     {
         List<FindResultEntry> _findResults= new List<FindResultEntry>();
 
+        public FindResult()
+        { }
+        public FindResult(List<FindResultEntry> resultList)
+        {
+            _findResults = resultList;
+        }
+
         public int Count()
         {
             return _findResults.Count;

@@ -23,7 +23,7 @@ namespace LogManagerService.DbLayer
             }
         }
 
-        public void SaveIndexEntries(Stream stream)
+        public void SaveIndexEntries(DateTime date, Stream stream)
         {
             DataTable dataTable = CreateDataTable();
             StreamReader streamReader = new StreamReader(stream);
