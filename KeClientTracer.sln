@@ -1,19 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Networking", "Networking\Networking.csproj", "{DCD91C2C-5365-4BF6-BD7F-BDD1A1626472}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTest", "ServerTest\ServerTest.csproj", "{7FF88AE0-DF34-4600-A07C-F6BA70326925}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientTest", "ClientTest\ClientTest.csproj", "{A08B4B2E-99CF-437A-B7CB-DBECD1E31F32}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogReaderTest", "LogReaderTest\LogReaderTest.csproj", "{CD6EEC0A-0A26-4715-8D8C-B58BE1D1556F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTest2", "ServerTest2\ServerTest2.csproj", "{0B992053-5D48-4998-87EF-3C5F78C46580}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogProcessors", "LogProcessors\LogProcessors.csproj", "{DE90DBAA-2F31-47DC-9066-33F2AD5A49F4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogStorage", "LogStorage\LogStorage.csproj", "{6120B590-852B-49C0-A114-6B888C58357D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsedLogIndexer", "ParsedLogIndexer\ParsedLogIndexer.csproj", "{F5D3047A-DF9D-4E69-B7B5-8B9FBCE7D459}"
 EndProject
@@ -37,34 +25,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DCD91C2C-5365-4BF6-BD7F-BDD1A1626472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DCD91C2C-5365-4BF6-BD7F-BDD1A1626472}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DCD91C2C-5365-4BF6-BD7F-BDD1A1626472}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DCD91C2C-5365-4BF6-BD7F-BDD1A1626472}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7FF88AE0-DF34-4600-A07C-F6BA70326925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FF88AE0-DF34-4600-A07C-F6BA70326925}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FF88AE0-DF34-4600-A07C-F6BA70326925}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FF88AE0-DF34-4600-A07C-F6BA70326925}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A08B4B2E-99CF-437A-B7CB-DBECD1E31F32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A08B4B2E-99CF-437A-B7CB-DBECD1E31F32}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A08B4B2E-99CF-437A-B7CB-DBECD1E31F32}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A08B4B2E-99CF-437A-B7CB-DBECD1E31F32}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD6EEC0A-0A26-4715-8D8C-B58BE1D1556F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD6EEC0A-0A26-4715-8D8C-B58BE1D1556F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD6EEC0A-0A26-4715-8D8C-B58BE1D1556F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD6EEC0A-0A26-4715-8D8C-B58BE1D1556F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0B992053-5D48-4998-87EF-3C5F78C46580}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0B992053-5D48-4998-87EF-3C5F78C46580}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0B992053-5D48-4998-87EF-3C5F78C46580}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0B992053-5D48-4998-87EF-3C5F78C46580}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE90DBAA-2F31-47DC-9066-33F2AD5A49F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE90DBAA-2F31-47DC-9066-33F2AD5A49F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE90DBAA-2F31-47DC-9066-33F2AD5A49F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE90DBAA-2F31-47DC-9066-33F2AD5A49F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6120B590-852B-49C0-A114-6B888C58357D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6120B590-852B-49C0-A114-6B888C58357D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6120B590-852B-49C0-A114-6B888C58357D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6120B590-852B-49C0-A114-6B888C58357D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F5D3047A-DF9D-4E69-B7B5-8B9FBCE7D459}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{F5D3047A-DF9D-4E69-B7B5-8B9FBCE7D459}.Debug|Any CPU.Build.0 = Debug|x86
 		{F5D3047A-DF9D-4E69-B7B5-8B9FBCE7D459}.Release|Any CPU.ActiveCfg = Release|Any CPU
