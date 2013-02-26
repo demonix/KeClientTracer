@@ -160,8 +160,9 @@ namespace LogReaderTest
             DateTime dt = new DateTime(Convert.ToInt32(dateParts[2]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[0]));
             for (int counter = 0; counter <=1000; counter++ )
             {
-                fileName = String.Format("{0}\\{1}.{2}.{3}.{4}.requestData", outPath, dt.Year.ToString("D4"), dt.Month.ToString("D2"), dt.Day.ToString("D2"), counter.ToString("D4"));
-                if (!File.Exists(fileName))
+                fileName = String.Format("{0}\\{1}.{2}.{3}.{4}.requestData", outPath, dt.Year.ToString("D4"),
+                                         dt.Month.ToString("D2"), dt.Day.ToString("D2"), counter.ToString("D4"));
+                if (!File.Exists(fileName) && !File.Exists(Path.ChangeExtension(fileName, "processedRequestData")))
                     try
                     {
                         FileStream fs = File.Create(fileName);
