@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using KeClientTracing.LogIndexing;
 
 namespace ParsedLogIndexer
 {
@@ -28,6 +29,7 @@ namespace ParsedLogIndexer
                     FileInfo indexFileInfo = new FileInfo(indexFileName);
                     if (indexFileInfo.LastWriteTimeUtc < file.LastWriteTimeUtc)
                     {
+                        Console.WriteLine();
                         Console.WriteLine("Index for " + Path.GetFileNameWithoutExtension(file.FullName) + " already exists, but log file is newer.");
                         File.Delete(indexFileName);
                     }
@@ -41,6 +43,7 @@ namespace ParsedLogIndexer
                     FileInfo uploadedIndexFileInfo = new FileInfo(uploadedIndexFileName);
                     if (uploadedIndexFileInfo.LastWriteTimeUtc < file.LastWriteTimeUtc)
                     {
+                        Console.WriteLine();
                         Console.WriteLine("Uploaded index for " + Path.GetFileNameWithoutExtension(file.FullName) + " already exists, but log file is newer.");
                         File.Delete(uploadedIndexFileName);
                     }
@@ -51,37 +54,81 @@ namespace ParsedLogIndexer
                 long i = 0;
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                using (Indexer indexer = new Indexer(file, '\t'))
+                RunNewIndexer(file, i, sw, indexFileName);
+                sw.Stop();
+
+            }
+        }
+        private static void RunNewIndexer(FileInfo file, long i, Stopwatch sw, string indexFileName)
+        {
+            using (StreamWriter indexFile = new StreamWriter(new FileStream(indexFileName,FileMode.Create,FileAccess.Write,FileShare.Read)))
+            using (Indexer2 indexer = new Indexer2(file, '\t'))
+            {
+                IndexKeyInfo indexKeyInfo;
+                while (indexer.ReadUpToNextKey(out indexKeyInfo))
                 {
-                    
-                    while (indexer.ReadUpToNextKey())
+                    i++;
+                    if (i % 1000 == 0)
+                        Console.Write("\rSpeed: {0} mb/min                      ",
+                                      ((double)(indexKeyInfo.Offest+indexKeyInfo.Length) / 1024 / 1024) /
+                                      ((double)sw.ElapsedMilliseconds / 100 / 60));
+                    try
                     {
-                    if (i%1000 ==0)
-                        Console.Write("\rSpeed: {0} mb/min                      ",((double)indexer.EndPosition/1024/1024)/((double)sw.ElapsedMilliseconds/100/60));   
-                        try
-                        {
-                            string s = String.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n",
+                        string s = String.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n",
+                                                 indexKeyInfo.Key.Replace("^", "\t"),
+                                                 indexKeyInfo.Offest,
+                                                 indexKeyInfo.Length,
+                                                 indexKeyInfo.SessionStartTime,
+                                                 indexKeyInfo.SessionEndTime);
+                        indexFile.Write(s);
+                        //WriteIndexEntry(indexFileName, s);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Out.WriteLine(
+                            "Error {0} while indexing line with key {1}. First line: {2}. Last line: {3}",
+                            ex.Message, "-", "-", "-");
+                            //indexer.CurrentKey, indexer.FirstKeyLine, indexer.LastKeyLine);
+                    }
+                }
+            }
+        }
+        private static void RunOldIndexer(FileInfo file, long i, Stopwatch sw, string indexFileName)
+        {
+            using (StreamWriter indexFile = new StreamWriter(new FileStream(indexFileName, FileMode.Create, FileAccess.Write, FileShare.Read)))
+            
+            using (OldIndexer indexer = new OldIndexer(file, '\t'))
+            {
+                while (indexer.ReadUpToNextKey())
+                {
+                    if (i%1000 == 0)
+                        Console.Write("\rSpeed: {0} mb/min                      ",
+                                      ((double) indexer.EndPosition/1024/1024)/
+                                      ((double) sw.ElapsedMilliseconds/100/60));
+                    try
+                    {
+                        string s = String.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n",
                                                  indexer.CurrentKey.Replace("^", "\t"),
                                                  indexer.StartPosition,
                                                  indexer.EndPosition -
                                                  indexer.StartPosition + 2,
                                                  indexer.FirstKeyLine.Split('\t')[1],
                                                  indexer.LastKeyLine.Split('\t')[1]);
-                            WriteIndexEntry(indexFileName, s);
-                        }
-                        catch(Exception ex)
-                        {
-                            Console.Out.WriteLine(
-                                "Error {0} while indexing line with key {1}. First line: {2}. Last line: {3}",
-                                ex.Message, indexer.CurrentKey, indexer.FirstKeyLine, indexer.LastKeyLine);
-                        }
+                        indexFile.Write(s);
+            
+            //            WriteIndexEntry(indexFileName, s);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Out.WriteLine(
+                            "Error {0} while indexing line with key {1}. First line: {2}. Last line: {3}",
+                            ex.Message, indexer.CurrentKey, indexer.FirstKeyLine, indexer.LastKeyLine);
                     }
                 }
-                sw.Stop();
-
             }
         }
-     /*   static void OldMain(string[] args)
+
+        /*   static void OldMain(string[] args)
         {
             string fullDirectoryPath = Path.GetFullPath(args[0]);
 

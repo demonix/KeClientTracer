@@ -199,7 +199,7 @@ namespace LogReaderTest
         static AutoResetEvent _wait = new AutoResetEvent(true);
 
 
-        static KeFrontLogProcessor lp = new KeFrontLogProcessor();
+        static KeFrontLogProcessor lp = new KeFrontLogProcessor(true);
         static object locker = new object();
 
         private static void OnLineReaded_writeSimple(object sender, LineReadedEventArgs e)

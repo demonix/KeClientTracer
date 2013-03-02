@@ -18,8 +18,8 @@ namespace LogManagerService.DbLayer
         public void RemoveIndexEntires(DateTime date)
         {
             MongoCollection<BsonDocument> items = GetItemsMongoCollection();
-            var query = Query.EQ("date",  DateTime.SpecifyKind(date, DateTimeKind.Utc));
-            SafeModeResult smr = items.Remove(query,SafeMode.True);
+            var query = Query.EQ("date", DateTime.SpecifyKind(date, DateTimeKind.Utc));
+            SafeModeResult smr = items.Remove(query, SafeMode.True);
             Console.WriteLine(smr.DocumentsAffected + " entries deleted from generic collection");
             MongoCollection<BsonDocument> itemsPerDate = GetMongoCollectionForDate(date);
             if (itemsPerDate != null)
@@ -28,7 +28,8 @@ namespace LogManagerService.DbLayer
 
         public void SaveIndexEntries(DateTime date, Stream stream)
         {
-            MongoCollection<BsonDocument> items = GetMongoCollectionForDate(date);
+            MongoCollection<BsonDocument> items = GetMongoCollectionForDate(date, true);
+            
             items.EnsureIndex(IndexKeys.Ascending("inn"));
 
             StreamReader streamReader = new StreamReader(stream);
@@ -47,8 +48,6 @@ namespace LogManagerService.DbLayer
                     items.InsertBatch(batch);
                     batch.Clear();
                 }
-
-
             }
             items.InsertBatch(batch);
         }
@@ -113,12 +112,12 @@ namespace LogManagerService.DbLayer
 
         private MongoCollection<BsonDocument> GetItemsMongoCollection()
         {
-            return GetMongoCollection("Items");
+            return GetMongoCollection("Items", true);
         }
 
-        private MongoCollection<BsonDocument> GetMongoCollectionForDate(DateTime date)
+        private MongoCollection<BsonDocument> GetMongoCollectionForDate(DateTime date, bool create = false)
         {
-            return GetMongoCollection(String.Format("{0:0000}{1:00}{2:00}", date.Year, date.Month, date.Day));
+            return GetMongoCollection(String.Format("{0:0000}{1:00}{2:00}", date.Year, date.Month, date.Day), create);
         }
 
         private MongoCollection<BsonDocument> GetMongoCollection(string collectionName, bool create = false)
