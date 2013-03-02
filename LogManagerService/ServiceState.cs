@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Common;
 using Common.ThreadSafeObjects;
 using LogManagerService.DbLayer;
 
@@ -12,22 +14,22 @@ namespace LogManagerService
     public class ServiceState
     {
 
-        
-        public ThreadSafeList<RotatedLog> AllLogs { get; private set; }
-        public ThreadSafeDictionary<string, string> LastKnownLogHashes { get; private set; }
+
+        public ConcurrentDictionary<string,RotatedLog> AllLogs { get; private set; }
+        public ConcurrentDictionary<string, string> LastKnownLogHashes { get; private set; }
         //private static Queue<string> _pendingLogHashes = new Queue<string>();
-        public  ThreadSafeQueue<string> HashesOfPendingLogs { get; private set; }
-        public ThreadSafeList<string> AllHashes { get; private set; }
+        public ConcurrentQueue<string> HashesOfPendingLogs { get; private set; }
+        public ConcurrentHashSet<string> AllHashes { get; private set; }
         private static ServiceState _instance;
         private static object _instanceLocker = new object();
         public IDb Db { get; private set; }
         Timer _tm ;
         private ServiceState()
         {
-            AllLogs = new ThreadSafeList<RotatedLog>();
-            LastKnownLogHashes = new ThreadSafeDictionary<string, string>();
-            HashesOfPendingLogs = new ThreadSafeQueue<string>();
-            AllHashes = new ThreadSafeList<string>();
+            AllLogs = new ConcurrentDictionary<string, RotatedLog>();
+            LastKnownLogHashes = new ConcurrentDictionary<string, string>();
+            HashesOfPendingLogs = new ConcurrentQueue<string>();
+            AllHashes = new ConcurrentHashSet<string>();
             Db = new MongoDb();
         }
 
@@ -68,16 +70,17 @@ namespace LogManagerService
             {
                 var hash = oplogLine.Split('\t')[1];
 
-                if (!AllHashes.GetSnapshot().Contains(hash))
-                    AllHashes.Add(hash);
-
+                AllHashes.AddIfNotExists(hash);
+                    
                 if (oplogLine[0] == 'r')
                     hashesOfNotYetProcessedLogs.Remove(hash);
                 if (oplogLine[0] == 'a')
                     hashesOfNotYetProcessedLogs.Add(hash);
             }
-                ServiceState.GetInstance().HashesOfPendingLogs.EnqueueMany(hashesOfNotYetProcessedLogs);
-                //_pendingLogHashes.Enqueue(hash);
+            foreach (string hash in hashesOfNotYetProcessedLogs)
+            {
+                HashesOfPendingLogs.Enqueue(hash);
+            }
            Console.Out.WriteLine("Finished processing oplog...");
         }
 
@@ -110,24 +113,27 @@ namespace LogManagerService
                             Console.Out.WriteLine("Error: {0}", exception);
                             continue;
                         }
-                        AllLogs.AddRange(fld.LogFiles);
+                        foreach (var log in fld.LogFiles)
+                        {
+                        AllLogs.TryAdd(log.Hash, log);    
+                        }
+                        
+                        
                         
                         string lastHash;
-                        LastKnownLogHashes.TryGet(key, out lastHash);
-                        List<RotatedLog> freshLogs = fld.GetFreshLogs(lastHash ?? "");
+
+                        List<RotatedLog> freshLogs =
+                            fld.GetFreshLogs(LastKnownLogHashes.TryGetValue(key, out lastHash) ? lastHash : "");
 
                         foreach (RotatedLog freshRotatedLog in freshLogs)
                         {
-                            if (HashesOfPendingLogs.Items.Contains(freshRotatedLog.Hash) || AllHashes.GetSnapshot().Contains(freshRotatedLog.Hash))
+                            if (HashesOfPendingLogs.Contains(freshRotatedLog.Hash) || AllHashes.Contains(freshRotatedLog.Hash))
                                 continue;
                             HashesOfPendingLogs.Enqueue(freshRotatedLog.Hash);
                             OpLog.Add(freshRotatedLog.Hash,freshRotatedLog.FileName);
                         }
                         if (freshLogs.Count > 0)
-                            if (LastKnownLogHashes.ContainsKey(key))
-                                LastKnownLogHashes[key] = freshLogs[0].Hash;
-                            else
-                                LastKnownLogHashes.Add(key, freshLogs[0].Hash);
+                            LastKnownLogHashes[key] = freshLogs[0].Hash;
                     }
                 }
                 FlushLogHashes();
@@ -137,16 +143,13 @@ namespace LogManagerService
 
         private void LoadLastLogHashes()
         {
-            lock (LastKnownLogHashes)
+            if (File.Exists(Settings.LastLogHashesFileName))
             {
-                if (File.Exists(Settings.LastLogHashesFileName))
+                string[] lines = File.ReadAllLines(Settings.LastLogHashesFileName);
+                foreach (string line in lines)
                 {
-                    string[] lines = File.ReadAllLines(Settings.LastLogHashesFileName);
-                    foreach (string line in lines)
-                    {
-                        if (!String.IsNullOrEmpty(line.Trim()))
-                            ServiceState.GetInstance().LastKnownLogHashes.Add(line.Split('\t')[0], line.Split('\t')[1]);
-                    }
+                    if (!String.IsNullOrEmpty(line.Trim()))
+                        LastKnownLogHashes.TryAdd(line.Split('\t')[0], line.Split('\t')[1]);
                 }
             }
         }
@@ -154,14 +157,10 @@ namespace LogManagerService
         private void FlushLogHashes()
         {
             File.WriteAllText(Settings.LastLogHashesFileName, "");
-            lock (LastKnownLogHashes)
-            {
-                List<KeyValuePair<string, string>> snapshot = ServiceState.GetInstance().LastKnownLogHashes.GetSnapshot();
-                foreach (KeyValuePair<string, string> logHash in snapshot)
+                foreach (KeyValuePair<string, string> logHash in LastKnownLogHashes)
                 {
                     File.AppendAllText(Settings.LastLogHashesFileName, String.Format("{0}\t{1}\r\n", logHash.Key, logHash.Value));
                 }
-            }
         }
 
         public string PendingLogList
@@ -169,21 +168,15 @@ namespace LogManagerService
             get
             {
                 StringBuilder sb = new StringBuilder();
-                List<string> hashList = HashesOfPendingLogs.Items;
+                string[] hashList = HashesOfPendingLogs.ToArray();
 
                 foreach (string hash in hashList)
                 {
-                    string hash1 = hash;
-                    RotatedLog rotatedLog = AllLogs.FirstOrDefault(l => l.Hash == hash1);
-                    sb.AppendFormat("{0}: {1}\r\n", hash1, rotatedLog == null ? "Unavaliable file" : rotatedLog.FileName);
+                    RotatedLog rotatedLog;
+                    var hasLog = AllLogs.TryGetValue(hash, out rotatedLog);
+                    sb.AppendFormat("{0}: {1}\r\n", hash, hasLog ? rotatedLog.FileName : "Unavaliable file");
                 }
             
-                /*foreach (string pendingLogHash in _pendingLogHashes)
-                {
-                    string pendingLogHash1 = pendingLogHash;
-                    RotatedLog rotatedLog = _allLogs.FirstOrDefault(l => l.Hash == pendingLogHash1);
-                    sb.AppendFormat("{0}: {1}\r\n",pendingLogHash1,rotatedLog == null ? "Deleted" : rotatedLog.FileName);
-                }*/
                 return sb.ToString();
             }
         }

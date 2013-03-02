@@ -35,22 +35,23 @@ namespace LogManagerService.Handlers
         private  string GetNextAlaviableFileName()
         {
             string result = "";
-            string hash = "";
+            string hash;
             List<string> hashesOfUnalavaliableFiles = new List<string>();
             while (ServiceState.GetInstance().HashesOfPendingLogs.TryDequeue(out hash))
             {
-                string hash1 = hash;
-                RotatedLog rotatedLog = ServiceState.GetInstance().AllLogs.FirstOrDefault(l => l.Hash == hash1);
-                if (rotatedLog != null)
+                RotatedLog rotatedLog; 
+                if (ServiceState.GetInstance().AllLogs.TryGetValue(hash, out rotatedLog))
                 {
                     result = rotatedLog.FileName;
-                    OpLog.Remove(hash1);
+                    OpLog.Remove(hash);
                     break;
                 }
-                hashesOfUnalavaliableFiles.Add(hash1);
+                hashesOfUnalavaliableFiles.Add(hash);
             }
-
-            ServiceState.GetInstance().HashesOfPendingLogs.EnqueueMany(hashesOfUnalavaliableFiles);
+            foreach (string hashToAddBack in hashesOfUnalavaliableFiles)
+            {
+                ServiceState.GetInstance().HashesOfPendingLogs.Enqueue(hashToAddBack);
+            }
             return result;
         }
 

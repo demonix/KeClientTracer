@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using Common;
@@ -15,7 +16,7 @@ namespace KeClientTracing.LogIndexing
         {
             _server = server;
         }
-        ThreadSafeQueue<string> _indexFilesToUploadQueue = new ThreadSafeQueue<string>();
+        ConcurrentQueue<string> _indexFilesToUploadQueue = new ConcurrentQueue<string>();
 
         public void Enqueue(string fileName)
         {
