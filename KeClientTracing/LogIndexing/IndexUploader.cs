@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using Common;
-using Common.ThreadSafeObjects;
 using Common.Web;
 
 namespace KeClientTracing.LogIndexing

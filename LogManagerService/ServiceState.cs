@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Common;
-using Common.ThreadSafeObjects;
 using LogManagerService.DbLayer;
 
 namespace LogManagerService
