@@ -99,6 +99,7 @@
     <Compile Include="Handlers\IndexHandler.cs" />
     <Compile Include="Handlers\LogDataHandler.cs" />
     <Compile Include="Handlers\NextFileHandler.cs" />
+    <Compile Include="Handlers\SearchHandler.cs" />
     <Compile Include="Handlers\StaticHandler.cs" />
     <Compile Include="Handlers\StatsHandler.cs" />
     <Compile Include="OpLog.cs" />
@@ -122,6 +123,11 @@
       <Project>{54EB0E85-7CE5-484D-9E05-BEDA815BCF8B}</Project>
       <Name>KeClientTracing</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="search.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

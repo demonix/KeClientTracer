@@ -115,9 +115,9 @@ namespace LogManagerService.DbLayer
             }
         }
 
-        public LogDataPlacementDescription GetLogDataPlacementDescription(string entryId)
+        public LogDataPlacementDescription GetLogDataPlacementDescription(string entryId, string date)
         {
-            DateTime date = DateTime.MinValue;
+            DateTime logDate = DateTime.MinValue;
             long offset = 0;
             long length = 0;
             using (SqlConnection connection = new SqlConnection(Settings.WeblogIndexDbConnectionString))
@@ -139,14 +139,14 @@ namespace LogManagerService.DbLayer
                     
                     while (reader.Read())
                     {
-                        date = reader.GetDateTime(0);
+                        logDate = reader.GetDateTime(0);
                         offset = reader.GetInt64(1);
                         length = reader.GetInt64(2);
                     }
 
                 }
             }
-            return  new LogDataPlacementDescription(date,offset,length);
+            return  new LogDataPlacementDescription(logDate,offset,length);
         }
 
         private void FillDataRow(string line, DataRow dataDow)

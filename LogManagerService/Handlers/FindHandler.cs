@@ -35,6 +35,7 @@ namespace LogManagerService.Handlers
             catch (Exception exception)
             {
                 Console.WriteLine(exception);
+                Console.WriteLine("Query was: " + _httpContext.Request.RawUrl);
                 WriteResponse(exception.ToString(), HttpStatusCode.InternalServerError, "");    
                 throw;
             }

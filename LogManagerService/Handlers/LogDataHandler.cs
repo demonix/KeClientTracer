@@ -47,7 +47,7 @@ namespace LogManagerService.Handlers
                 return;
             }
             string outType = HasParam("outType") ?RequestParams("outType").ToLower():"";
-            LogDataPlacementDescription ldpd = ServiceState.GetInstance().Db.GetLogDataPlacementDescription(RequestParams("id"));
+            LogDataPlacementDescription ldpd = ServiceState.GetInstance().Db.GetLogDataPlacementDescription(RequestParams("id"), RequestParams("date"));
             if (ldpd == null)
             {
                 WriteResponse("no such id", HttpStatusCode.NotFound, "no such id");

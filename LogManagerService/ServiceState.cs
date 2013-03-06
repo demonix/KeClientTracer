@@ -16,13 +16,12 @@ namespace LogManagerService
 
         public ConcurrentDictionary<string,RotatedLog> AllLogs { get; private set; }
         public ConcurrentDictionary<string, string> LastKnownLogHashes { get; private set; }
-        //private static Queue<string> _pendingLogHashes = new Queue<string>();
         public ConcurrentQueue<string> HashesOfPendingLogs { get; private set; }
         public ConcurrentHashSet<string> AllHashes { get; private set; }
         private static ServiceState _instance;
         private static object _instanceLocker = new object();
         public IDb Db { get; private set; }
-        Timer _tm ;
+        Timer _tm;
         private ServiceState()
         {
             AllLogs = new ConcurrentDictionary<string, RotatedLog>();
@@ -63,14 +62,12 @@ namespace LogManagerService
             Console.Out.WriteLine("Begin processing oplog...");
             if (!File.Exists(Settings.OpLogPath)) return;
             string[] oplogFile = File.ReadAllLines(Settings.OpLogPath);
-            List<string> hashesOfNotYetProcessedLogs = new List<string>();
+            HashSet<string> hashesOfNotYetProcessedLogs = new HashSet<string>();
 
             foreach (string oplogLine in oplogFile)
             {
                 var hash = oplogLine.Split('\t')[1];
-
                 AllHashes.AddIfNotExists(hash);
-                    
                 if (oplogLine[0] == 'r')
                     hashesOfNotYetProcessedLogs.Remove(hash);
                 if (oplogLine[0] == 'a')
@@ -101,43 +98,46 @@ namespace LogManagerService
 
                     foreach (string fileMask in fileMasks)
                     {
-                        string key = String.Format("{0}\\{1}", logDirectory, fileMask);
-                        RotatedLogFolder fld;
-                        try
-                        {
-                            fld = new RotatedLogFolder(logDirectory, fileMask);
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.Out.WriteLine("Error: {0}", exception);
-                            continue;
-                        }
-                        foreach (var log in fld.LogFiles)
-                        {
-                        AllLogs.TryAdd(log.Hash, log);    
-                        }
-                        
-                        
-                        
-                        string lastHash;
-
-                        List<RotatedLog> freshLogs =
-                            fld.GetFreshLogs(LastKnownLogHashes.TryGetValue(key, out lastHash) ? lastHash : "");
-
-                        foreach (RotatedLog freshRotatedLog in freshLogs)
-                        {
-                            if (HashesOfPendingLogs.Contains(freshRotatedLog.Hash) || AllHashes.Contains(freshRotatedLog.Hash))
-                                continue;
-                            HashesOfPendingLogs.Enqueue(freshRotatedLog.Hash);
-                            OpLog.Add(freshRotatedLog.Hash,freshRotatedLog.FileName);
-                        }
-                        if (freshLogs.Count > 0)
-                            LastKnownLogHashes[key] = freshLogs[0].Hash;
+                        ReadFilesByMaskFromFolder(logDirectory, fileMask);
                     }
                 }
                 FlushLogHashes();
             }
             Console.Out.WriteLine(PendingLogList);
+            Console.Out.WriteLine("Reread files finished...");
+        }
+
+        private void ReadFilesByMaskFromFolder(string logDirectory, string fileMask)
+        {
+            string key = String.Format("{0}\\{1}", logDirectory, fileMask);
+            RotatedLogFolder fld;
+            try
+            {
+                fld = new RotatedLogFolder(logDirectory, fileMask);
+            }
+            catch (Exception exception)
+            {
+                Console.Out.WriteLine("Error: {0}", exception);
+                return;
+            }
+            foreach (var log in fld.LogFiles)
+            {
+                AllLogs.TryAdd(log.Hash, log);
+            }
+
+            string lastHash;
+            List<RotatedLog> freshLogs =
+                fld.GetFreshLogs(LastKnownLogHashes.TryGetValue(key, out lastHash) ? lastHash : "");
+
+            foreach (RotatedLog freshRotatedLog in freshLogs)
+            {
+                if (!AllHashes.AddIfNotExists(freshRotatedLog.Hash))
+                    continue;
+                HashesOfPendingLogs.Enqueue(freshRotatedLog.Hash);
+                OpLog.Add(freshRotatedLog.Hash, freshRotatedLog.FileName);
+            }
+            if (freshLogs.Count > 0)
+                LastKnownLogHashes[key] = freshLogs[0].Hash;
         }
 
         private void LoadLastLogHashes()
@@ -168,14 +168,12 @@ namespace LogManagerService
             {
                 StringBuilder sb = new StringBuilder();
                 string[] hashList = HashesOfPendingLogs.ToArray();
-
                 foreach (string hash in hashList)
                 {
                     RotatedLog rotatedLog;
                     var hasLog = AllLogs.TryGetValue(hash, out rotatedLog);
                     sb.AppendFormat("{0}: {1}\r\n", hash, hasLog ? rotatedLog.FileName : "Unavaliable file");
                 }
-            
                 return sb.ToString();
             }
         }

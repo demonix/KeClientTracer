@@ -5,19 +5,19 @@ using Common;
 
 namespace KeClientTracing.LogIndexing
 {
-    public class Indexer2: IDisposable
+    public class Indexer: IDisposable
     {
         private Stream _fileStream;
         private StreamReader _streamReader;
         private char _keyDelimiter;
         
-        public Indexer2(FileInfo file, char keyDelimiter)
+        public Indexer(FileInfo file, char keyDelimiter)
         {
             _fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             _streamReader = new StreamReader(_fileStream, Encoding.Default);
             _keyDelimiter = keyDelimiter;
         }
-        public Indexer2(Stream file, char keyDelimiter)
+        public Indexer(Stream file, char keyDelimiter)
         {
             _fileStream = file;
             _streamReader = new StreamReader(_fileStream, Encoding.Default);

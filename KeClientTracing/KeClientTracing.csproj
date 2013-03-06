@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LogIndexing\Indexer2.cs" />
+    <Compile Include="LogIndexing\Indexer.cs" />
     <Compile Include="LogIndexing\IndexLineHelper.cs" />
     <Compile Include="LogIndexing\IndexUploader.cs" />
     <Compile Include="LogIndexing\OldIndexer.cs" />

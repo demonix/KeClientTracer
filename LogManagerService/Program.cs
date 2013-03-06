@@ -14,17 +14,8 @@ namespace LogManagerService
 {
     class Program
     {
-        //static Dictionary<string, string> _lastKnownLogHashes = new Dictionary<string, string>();
-        //private static Queue<string> _pendingLogHashes = new Queue<string>();
-        //private static ThreadSafeQueue<string> _hashesOfPendingLogs = new ThreadSafeQueue<string>();
-        //static Dictionary<string,string> _hashToFile = new Dictionary<string, string>();
-
-
         static void Main(string[] args)
         {
-
-           
-            //GetFiles(null);
             using (WebServer webServer = new WebServer("http://+:1819/logManager/"))
             {
                 ServiceState.Init();
@@ -49,13 +40,8 @@ namespace LogManagerService
             }
             catch (Exception exception)
             {
-                
                 Console.WriteLine(exception);
-                
             }
-            
-           
-            
         }
 
         private static void HandleRequest(HttpListenerContext httpContext)
@@ -65,6 +51,9 @@ namespace LogManagerService
                 new EmptyHandler(httpContext).Handle();
             switch (requestParts[1].ToLower())
             {
+                case "search":
+                    new SearchHandler(httpContext).Handle();
+                    break;
                 case "stats":
                     new StatsHandler(httpContext).Handle();
                     break;

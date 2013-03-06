@@ -59,7 +59,7 @@ namespace ParsedLogIndexer
         private static void RunNewIndexer(FileInfo file, string indexFileName)
         {
             using (StreamWriter indexFile = new StreamWriter(new FileStream(indexFileName,FileMode.Create,FileAccess.Write,FileShare.Read)))
-            using (Indexer2 indexer = new Indexer2(file, '\t'))
+            using (Indexer indexer = new Indexer(file, '\t'))
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();

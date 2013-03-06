@@ -86,6 +86,6 @@ namespace LogManagerService
             }
         }
 
-        private const int BytesToRead = 100;
+        private const int BytesToRead = 1024;
     }
 }
