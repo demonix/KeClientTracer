@@ -125,7 +125,7 @@ namespace LogManagerService.DbLayer
 
         private MongoCollection<BsonDocument> GetMongoCollectionForDate(DateTime date, bool create = false)
         {
-            return GetMongoCollection(String.Format("{0:0000}{1:00}{2:00}", date.Year, date.Month, date.Day), create);
+            return GetMongoCollection(String.Format("i{0:0000}{1:00}{2:00}", date.Year, date.Month, date.Day), create);
         }
 
         private MongoCollection<BsonDocument> GetMongoCollection(string collectionName, bool create = false)
