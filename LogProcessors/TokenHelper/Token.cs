@@ -22,7 +22,7 @@ namespace LogProcessors.TokenHelper
             string[] splits = input.Split('\n');
             if (splits.Length != 4)
                 throw new Exception(string.Format("Can't parse token from string: {0}.", input));
-            Guid abon = new Guid(splits[0]);
+            Guid abon = String.IsNullOrEmpty(splits[0]) ? Guid.Empty : new Guid(splits[0]);
             Guid user = new Guid(splits[1]);
             string thumbprint = splits[2];
             long ticks;

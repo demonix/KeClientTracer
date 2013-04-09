@@ -41,29 +41,37 @@ namespace LogProcessors
                 try
                 {
                     token = TokenCache2.Get(nginxLogLine.Token);
-                    OrganizationCertificateDescription ocd = fakeMode ? null : CertificateCache2.Get(token.Thumbprint);
-                    if (ocd == null)
+
+                    if (String.IsNullOrEmpty(token.Thumbprint))
+                        unstructuredName = token.User.ToString();
+                    else
                     {
-                        if (!fakeMode)
+                        OrganizationCertificateDescription ocd = fakeMode
+                                                                     ? null
+                                                                     : CertificateCache2.Get(token.Thumbprint);
+                        if (ocd == null)
                         {
-                            error = "cannot find cert with thumprint = [" + token.Thumbprint + "]";
-                            unstructuredName = "";
+                            if (!fakeMode)
+                            {
+                                error = "cannot find cert with thumprint = [" + token.Thumbprint + "]";
+                                unstructuredName = "";
+                            }
+                            else
+                            {
+                                unstructuredName = token.Thumbprint;
+                            }
                         }
                         else
                         {
-                            unstructuredName = token.Thumbprint;
+                            unstructuredName = ocd.UnstructuredName;
                         }
-                    }
-                    else
-                    {
-                        unstructuredName = ocd.UnstructuredName;
                     }
                 }
                 catch (Exception ex)
                 {
                     error = String.Format("Error while parsing token {0}\r\n", nginxLogLine.Token);
                     if (token != null)
-                        error += String.Format("A:{0}\r\nU:{1}\r\nTh:{2};\r\nDt:{3}\r\n", token.Abon, token.User,
+                        error += String.Format("A:{0}\r\nU:{1}\r\nTh:{2}\r\nDt:{3}\r\n", token.Abon, token.User,
                                                token.Thumbprint, token.ValidTo);
                     error += ex.ToString();
                     result = false;
