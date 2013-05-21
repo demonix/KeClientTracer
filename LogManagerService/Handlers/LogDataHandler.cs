@@ -54,7 +54,23 @@ namespace LogManagerService.Handlers
                 return;
             }
             
-            string file = FileUtils.DateToFileName(Settings.SortedLogsPath, ldpd.Date, "sorted");
+
+            string file = null;
+
+            foreach (string sortedLogsPath in Settings.SortedLogsPaths)
+            {
+                var possiblePath = FileUtils.DateToFileName(sortedLogsPath, ldpd.Date, "sorted");    
+                if (File.Exists(possiblePath))
+                {
+                    file = possiblePath;
+                    break;
+                } 
+            }
+            if (String.IsNullOrEmpty(file))
+            {
+                WriteResponse(Encoding.UTF8.GetBytes("Файл с данными за " + ldpd.Date.ToShortDateString() +" не найден, обратитесь в СПС."), HttpStatusCode.OK, "OK", "text/plain; charset=utf-8");
+                return;
+            }
             
             switch (outType)
             {
