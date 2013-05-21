@@ -14,7 +14,7 @@ namespace LogProcessors.TokenHelper
             byte[] encryptedTokenBytes = Convert.FromBase64String(token);
             byte[] tokenBytes = (needDecrypt ? TryDecryptToken(encryptedTokenBytes) : encryptedTokenBytes);
             if (tokenBytes == null)
-                throw new Exception ("cannot get token from string: ["+token+"]");
+                throw new Exception ("cannot decrypt token: ["+token+"]");
             return Token.Deserialize(Encoding.UTF8.GetString(tokenBytes));
         }
 
