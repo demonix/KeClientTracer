@@ -39,7 +39,7 @@ namespace Common
                     if (File.Exists("settings\\settings"))
                         _instance = new Settings("settings\\settings", ":=", Encoding.Default);
                     else if (File.Exists("..\\settings\\settings"))
-                        _instance = new Settings("settings\\settings", ":=", Encoding.Default);
+                        _instance = new Settings("..\\settings\\settings", ":=", Encoding.Default);
                     else
                         throw new Exception("Settings file does not exists");
                 }

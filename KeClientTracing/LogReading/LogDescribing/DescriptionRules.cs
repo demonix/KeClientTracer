@@ -9,8 +9,8 @@ namespace KeClientTracing.LogReading.LogDescribing
     public class DescriptionRules
     {
         List<UriRule> _uriRules = new List<UriRule>();
-        const string DescriptionsSettingsPath = "logDescriptions.xml";
-        private static DescriptionRules _dr;
+        const string DescriptionsSettingsPath = "settings\\logDescriptions.xml";
+        private static volatile DescriptionRules _dr;
         private static object _locker = new object();
         private static FileSystemWatcher _fsw;
 
