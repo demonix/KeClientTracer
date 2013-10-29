@@ -130,7 +130,7 @@ namespace LogManagerService.DbLayer
 
         private MongoCollection<BsonDocument> GetMongoCollection(string collectionName, bool create = false)
         {
-            string[] connstring = File.ReadAllLines(@"settings\WeblogIndexMongoDbConnectionString");
+            string[] connstring = Settings.WeblogIndexMongoDbConnectionString;
             MongoUrlBuilder builder = new MongoUrlBuilder(connstring[0]);
             builder.SocketTimeout = new TimeSpan(0, 30, 0);
             //builder.Server = port.HasValue ? new MongoServerAddress(host, port.Value) : new MongoServerAddress(host);

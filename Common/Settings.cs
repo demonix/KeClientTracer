@@ -36,7 +36,12 @@ namespace Common
             {
                 if (_instance == null)
                 {
-                    _instance = new Settings("settings\\settings", ":=", Encoding.Default);
+                    if (File.Exists("settings\\settings"))
+                        _instance = new Settings("settings\\settings", ":=", Encoding.Default);
+                    else if (File.Exists("..\\settings\\settings"))
+                        _instance = new Settings("settings\\settings", ":=", Encoding.Default);
+                    else
+                        throw new Exception("Settings file does not exists");
                 }
             }
             return _instance;

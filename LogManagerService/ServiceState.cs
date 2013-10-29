@@ -86,8 +86,8 @@ namespace LogManagerService
             {
                 AllLogs.Clear();
                 Console.Out.WriteLine("Reread files...");
-                string[] fileMasks = File.ReadAllLines("fileMasks.txt");
-                string[] logDirectories = File.ReadAllLines("logDirectories.txt");
+                string[] fileMasks = Settings.LogfileMasks;
+                string[] logDirectories = Settings.LogDirectories;
                 foreach (string logDirectory in logDirectories)
                 {
                     if (!Directory.Exists(logDirectory))
