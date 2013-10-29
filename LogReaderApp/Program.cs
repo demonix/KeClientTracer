@@ -20,7 +20,7 @@ namespace LogReaderTest
         private static HashSet<string> _sessions = new HashSet<string>();
         private static AutoResetEvent _finishedReading = new AutoResetEvent(false);
         private static Stopwatch stopwatch = new Stopwatch();
-        private static string _sortedLogsDirectory = "";
+        private static string _unsortedLogsDirectory = "";
 
 
         static void Main(string[] args)
@@ -28,9 +28,9 @@ namespace LogReaderTest
             Console.Out.WriteLine("InstanceId: {0}", _instanceId);
             TimeSpan ts = new TimeSpan();
             Settings settings = Settings.GetInstance();
-            _sortedLogsDirectory = settings.TryGetValue("SortedLogsDirectory").TrimEnd('\\');
-            if (string.IsNullOrEmpty(_sortedLogsDirectory))
-                throw new Exception("SortedLogsDirectory not specified");
+            _unsortedLogsDirectory = settings.TryGetValue("UnsortedLogsDirectory").TrimEnd('\\');
+            if (string.IsNullOrEmpty(_unsortedLogsDirectory))
+                throw new Exception("UnsortedLogsDirectory not specified");
             
             string inputFile;
             while (GetNextFileNameToProcess(args, out inputFile))
@@ -100,7 +100,11 @@ namespace LogReaderTest
         private static bool GetFromWebService(string[] args, out string inputFile)
         {
             inputFile = "";
-            string serverUrl = args[1];
+            Settings settings = Settings.GetInstance();
+            string serverUrl = settings.TryGetValue("LogManagerServiceAddress");
+            if (string.IsNullOrEmpty(_unsortedLogsDirectory))
+                throw new Exception("LogManagerServiceAddress not specified");
+            
             Response response;
             try
             {
@@ -161,7 +165,7 @@ namespace LogReaderTest
             DateTime dt = new DateTime(Convert.ToInt32(dateParts[2]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[0]));
             for (int counter = 0; counter <=1000; counter++ )
             {
-                fileName = String.Format("{0}\\{1}.{2}.{3}.{4}.requestData", _sortedLogsDirectory, dt.Year.ToString("D4"),
+                fileName = String.Format("{0}\\{1}.{2}.{3}.{4}.requestData", _unsortedLogsDirectory, dt.Year.ToString("D4"),
                                          dt.Month.ToString("D2"), dt.Day.ToString("D2"), counter.ToString("D4"));
                 if (!File.Exists(fileName) && !File.Exists(Path.ChangeExtension(fileName, "processedRequestData")))
                     try
