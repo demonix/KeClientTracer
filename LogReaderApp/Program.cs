@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using Common;
 using Common.Web;
 using KeClientTracing.LogReading;
 using LogProcessors;
@@ -19,18 +20,18 @@ namespace LogReaderTest
         private static HashSet<string> _sessions = new HashSet<string>();
         private static AutoResetEvent _finishedReading = new AutoResetEvent(false);
         private static Stopwatch stopwatch = new Stopwatch();
-        private static string outPath = "";
+        private static string _sortedLogsDirectory = "";
 
 
         static void Main(string[] args)
         {
             Console.Out.WriteLine("InstanceId: {0}", _instanceId);
             TimeSpan ts = new TimeSpan();
-            outPath = "out";
-            if (File.Exists("outPath"))
-                outPath = File.ReadAllText("outPath");
-            outPath = outPath.TrimEnd('\\');
-
+            Settings settings = Settings.GetInstance();
+            _sortedLogsDirectory = settings.TryGetValue("SortedLogsDirectory").TrimEnd('\\');
+            if (string.IsNullOrEmpty(_sortedLogsDirectory))
+                throw new Exception("SortedLogsDirectory not specified");
+            
             string inputFile;
             while (GetNextFileNameToProcess(args, out inputFile))
             {
@@ -160,7 +161,7 @@ namespace LogReaderTest
             DateTime dt = new DateTime(Convert.ToInt32(dateParts[2]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[0]));
             for (int counter = 0; counter <=1000; counter++ )
             {
-                fileName = String.Format("{0}\\{1}.{2}.{3}.{4}.requestData", outPath, dt.Year.ToString("D4"),
+                fileName = String.Format("{0}\\{1}.{2}.{3}.{4}.requestData", _sortedLogsDirectory, dt.Year.ToString("D4"),
                                          dt.Month.ToString("D2"), dt.Day.ToString("D2"), counter.ToString("D4"));
                 if (!File.Exists(fileName) && !File.Exists(Path.ChangeExtension(fileName, "processedRequestData")))
                     try

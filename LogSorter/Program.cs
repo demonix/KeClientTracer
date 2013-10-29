@@ -12,19 +12,27 @@ namespace LogSorter
     class Program
     {
         static List<ISorter> _sorters = new List<ISorter>();
-        private const int SimultaneousProcessCount = 5;
+        private const int DefaultSimultaneousProcessCount = 5;
         private static Semaphore _sem;
         static void Main(string[] args)
         {
-            int simultaneousProcessCount = 0;
-            if (args.Length != 0)
-                Int32.TryParse(args[0], out simultaneousProcessCount);
-            
-            if (simultaneousProcessCount == 0)
-                simultaneousProcessCount = SimultaneousProcessCount;
+            Settings settings = Settings.GetInstance();
+            var value = settings.TryGetValue("SimultaneousSortProcessCount");
+            int simultaneousProcessCount;
+            if(Int32.TryParse(value, out simultaneousProcessCount))
+            {
+                simultaneousProcessCount = DefaultSimultaneousProcessCount;
+            }
             _sem = new Semaphore(simultaneousProcessCount, simultaneousProcessCount);
-            string folder = "logs";
-            List<DateTime> fileDates = GetFileDates(folder);
+
+            string dir = settings.TryGetValue("UnsortedLogsDirectory");
+            if (String.IsNullOrEmpty(dir))
+                throw new Exception("UnsortedLogsDirectory not specified");
+
+            string fullDirectoryPath = Path.GetFullPath(dir);
+
+
+            List<DateTime> fileDates = GetFileDates(fullDirectoryPath);
             foreach (DateTime fileDate in fileDates)
             {
 
@@ -32,9 +40,9 @@ namespace LogSorter
                 {
                     ISorter sorter;
                     if (args.Length == 2 && args[1] == "n" || args.Length == 1 && args[0] == "n")
-                        sorter = new NSorter(folder, fileDate, 500);
+                        sorter = new NSorter(fullDirectoryPath, fileDate, 500);
                     else
-                        sorter = new Sorter(folder, fileDate, 500, _sem);
+                        sorter = new Sorter(fullDirectoryPath, fileDate, 500, _sem);
                     sorter.Finished+=SorterFinished;
                     _sorters.Add(sorter);
                 }

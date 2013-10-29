@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using Common;
 using KeClientTracing.LogIndexing;
 
 namespace ParsedLogIndexer
@@ -12,9 +13,14 @@ namespace ParsedLogIndexer
 
         static void Main(string[] args)
         {
-            string fullDirectoryPath = Path.GetFullPath(args[0]);
+            Settings settings = Settings.GetInstance();
+            string dir = settings.TryGetValue("UnsortedLogsDirectory");
+            if (String.IsNullOrEmpty(dir))
+                throw new Exception("UnsortedLogsDirectory not specified");
 
-            if (args.Length != 1 || !Directory.Exists(fullDirectoryPath)) return;
+            string fullDirectoryPath = Path.GetFullPath(dir);
+
+            if (!Directory.Exists(fullDirectoryPath)) return;
 
             FileInfo[] files = new DirectoryInfo(fullDirectoryPath).GetFiles("*.sorted");
             foreach (FileInfo file in files)

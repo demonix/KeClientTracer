@@ -16,7 +16,8 @@ namespace LogManagerService
     {
         static void Main(string[] args)
         {
-            using (WebServer webServer = new WebServer("http://+:1819/logManager/"))
+            
+            using (WebServer webServer = new WebServer(Settings.ServiceBindingAddress))
             {
                 ServiceState.Init();
                 webServer.IncomingRequest += WebServer_IncomingRequest;
