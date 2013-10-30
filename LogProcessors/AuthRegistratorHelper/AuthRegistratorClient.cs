@@ -10,7 +10,7 @@ namespace LogProcessors.AuthRegistratorHelper
         private static string[] topology;
         public AuthRegistratorClient()
         {
-            using (StreamReader reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"settings\certs")))
+            using (StreamReader reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, File.Exists(@"settings\topology\certs") ? @"settings\topology\certs" : @"..\settings\topology\certs")))
             {
                 topology = reader.ReadToEnd().Replace("\r", "").Split('\n');
             }

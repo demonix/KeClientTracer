@@ -14,37 +14,49 @@ namespace LogSorter
     {
         private Process _sortProcess;
         public DateTime DateOfLogs { get; private set; }
-        public string Folder { get; private set; }
         public int Memory { get; private set; }
-        private Semaphore _semaphore;
         private object _locker = new object();
         private bool _alreadyStarted;
         private Guid _instanceId;
-
-        public Sorter(string folder, DateTime dateOfLogs, int memory, Semaphore semaphore)
+        private string _unsortedLogsFolder;
+        private string _tempFolder;
+        private string _outputFile;
+        
+        public Sorter(string unsortedLogsFolder, string sortedLogsFolder, string tempFolder, DateTime dateOfLogs, int memory)
         {
             DateOfLogs = dateOfLogs;
-            Folder = folder.TrimEnd('\\');
-            FileList = GetFileList();
             Memory = memory;
-            _semaphore = semaphore;
             _instanceId = Guid.NewGuid();
-
+            _tempFolder = Path.Combine(tempFolder, _instanceId.ToString());
+            _unsortedLogsFolder = unsortedLogsFolder.TrimEnd('\\');
+            _outputFile = Path.Combine(sortedLogsFolder, FileUtils.DateToFileName("", DateOfLogs, "sorted"));
+             
+            FileList = GetFileList();
+            
         }
 
         private List<string> GetFileList()
         {
-            return Directory.GetFiles(Folder, FileUtils.DateToFileName("", DateOfLogs, "*.requestData")).ToList();
+            return Directory.GetFiles(_unsortedLogsFolder, FileUtils.DateToFileName("", DateOfLogs, "*.requestData")).ToList();
         }
 
         protected List<string> FileList { get; private set; }
 
         public void WaitForExit()
         {
-            _sortProcess.WaitForExit();
+            //_sortProcess.WaitForExit();
+            _waitHandle.WaitOne();
         }
 
-        public event EventHandler Finished;
+        public event EventHandler<EventArgs> Finished;
+        private ManualResetEvent _waitHandle = new ManualResetEvent(false);
+        
+        private void OnSortFinished()
+        {
+            var handler = Finished;
+            if (handler != null) handler(this, EventArgs.Empty);
+            _waitHandle.Set();
+        }
 
         public void Start()
         {
@@ -55,10 +67,9 @@ namespace LogSorter
                 _alreadyStarted = true;
             }
             
-            string tempFolder = String.Format("{0}\\tmp\\{1}", Folder, _instanceId);
-            Console.Error.WriteLine("Starting sorter for {0}, temp folder: {1}", DateOfLogs,tempFolder);
-            if (!Directory.Exists(tempFolder))
-                Directory.CreateDirectory(tempFolder);
+            Console.Error.WriteLine("Starting sorter for {0}, temp folder: {1}", DateOfLogs,_tempFolder);
+            if (!Directory.Exists(_tempFolder))
+                Directory.CreateDirectory(_tempFolder);
 
             _sortProcess = new Process();
             ProcessStartInfo psi = new ProcessStartInfo("sort.exe", GetCommandLine());
@@ -87,31 +98,28 @@ namespace LogSorter
 
         private void WorkingProcessExited(object sender, EventArgs e)
         {
-            string tempFolder = String.Format("{0}\\tmp\\{1}", Folder,_instanceId);
-            _semaphore.Release(1);
             foreach (string file in FileList)
                 FileUtils.ChangeExtension(file, "processedRequestData", 10);
-            if (new DirectoryInfo(tempFolder).GetFiles().Length ==0)
-                Directory.Delete(tempFolder);
+            if (new DirectoryInfo(_tempFolder).GetFiles().Length ==0)
+                Directory.Delete(_tempFolder);
             else
             {
                 Console.WriteLine("sort.exe has left some files in temp folder. Command executed: {0}",GetCommandLine());
             }
+            OnSortFinished();
         }
 
         private string GetCommandLine()
         {
-            string tempFolder = String.Format("{0}\\tmp\\{1}", Folder,_instanceId);
-            string outputFile = String.Format("{0}\\sorted\\{1}", Folder, FileUtils.DateToFileName("", DateOfLogs, "sorted"));
             StringBuilder fileListBuilder = new StringBuilder();
             foreach (string file in FileList)
             {
                 fileListBuilder.AppendFormat("\"{0}\" ", file);
             }
-            if (File.Exists(outputFile))
-                fileListBuilder.AppendFormat("\"{0}\" ", outputFile);
+            if (File.Exists(_outputFile))
+                fileListBuilder.AppendFormat("\"{0}\" ", _outputFile);
 
-            return String.Format("-S {0}M -T \"{1}\" -o {2} {3}", Memory, tempFolder, outputFile, fileListBuilder);
+            return String.Format("-S {0}M -T \"{1}\" -o {2} {3}", Memory, _tempFolder, _outputFile, fileListBuilder);
         }
 
         public void SimulateStart()
@@ -123,7 +131,6 @@ namespace LogSorter
                 _alreadyStarted = true;
             }
             Console.Out.WriteLine("sort.exe" + GetCommandLine());
-            _semaphore.Release(1);
         }
     }
 }

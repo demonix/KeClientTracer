@@ -17,9 +17,15 @@ namespace LogSorter
         static void Main(string[] args)
         {
             Settings settings = Settings.GetInstance();
-            var value = settings.TryGetValue("SimultaneousSortProcessCount");
+
+            var sortMode = settings.TryGetValue("SortMode");
+            if (String.IsNullOrEmpty(sortMode))
+                throw new Exception("SortMode not specified");
+            
+
+            var sortProcessCount = settings.TryGetValue("SimultaneousSortProcessCount");
             int simultaneousProcessCount;
-            if(Int32.TryParse(value, out simultaneousProcessCount))
+            if(Int32.TryParse(sortProcessCount, out simultaneousProcessCount))
             {
                 simultaneousProcessCount = DefaultSimultaneousProcessCount;
             }
@@ -28,21 +34,31 @@ namespace LogSorter
             string dir = settings.TryGetValue("UnsortedLogsDirectory");
             if (String.IsNullOrEmpty(dir))
                 throw new Exception("UnsortedLogsDirectory not specified");
+            string unsortedLogsDirectory = Path.GetFullPath(dir);
 
-            string fullDirectoryPath = Path.GetFullPath(dir);
+            dir = settings.TryGetValue("SortedLogsDirectory");
+            if (String.IsNullOrEmpty(dir))
+                throw new Exception("SortedLogsDirectory not specified");
+            string sortedLogsDirectory = Path.GetFullPath(dir);
+
+            dir = settings.TryGetValue("TempSortDirectory");
+            if (String.IsNullOrEmpty(dir))
+                throw new Exception("TempSortDirectory not specified");
+            string tempSortDirectory = Path.GetFullPath(dir);
 
 
-            List<DateTime> fileDates = GetFileDates(fullDirectoryPath);
+
+            List<DateTime> fileDates = GetFileDates(unsortedLogsDirectory);
             foreach (DateTime fileDate in fileDates)
             {
 
                 if (fileDate < DateTime.Now.AddDays(-1))
                 {
                     ISorter sorter;
-                    if (args.Length == 2 && args[1] == "n" || args.Length == 1 && args[0] == "n")
-                        sorter = new NSorter(fullDirectoryPath, fileDate, 500);
+                    if (sortMode.ToLower() == "nsort")
+                        sorter = new NSorter(unsortedLogsDirectory,sortedLogsDirectory, tempSortDirectory, fileDate, 500);
                     else
-                        sorter = new Sorter(fullDirectoryPath, fileDate, 500, _sem);
+                        sorter = new Sorter(unsortedLogsDirectory, sortedLogsDirectory, tempSortDirectory, fileDate, 500);
                     sorter.Finished+=SorterFinished;
                     _sorters.Add(sorter);
                 }

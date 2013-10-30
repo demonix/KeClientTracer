@@ -6,6 +6,6 @@ namespace LogSorter
     {
         void Start();
         void WaitForExit();
-        event EventHandler Finished;
+        event EventHandler<EventArgs> Finished;
     }
 }

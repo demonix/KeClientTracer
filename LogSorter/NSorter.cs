@@ -13,34 +13,43 @@ namespace LogSorter
     public class NSorter : ISorter
     {
         public DateTime DateOfLogs { get; private set; }
-        public string Folder { get; private set; }
         public int Memory { get; private set; }
         private object _locker = new object();
         private bool _alreadyStarted;
         private Guid _instanceId;
         private bool _errorOccured;
-        private ManualResetEvent _waitHandle = new ManualResetEvent(false);
-        protected List<string> FileList { get; private set; }
+        private string _unsortedLogsFolder;
         private string _tempFolder;
         private string _outputFile;
-        private List<string> _commandsExecuted  = new List<string>();
+        private ManualResetEvent _waitHandle = new ManualResetEvent(false);
+        protected List<string> FileList { get; private set; }
         private string _sortedForMergeFile;
-        public event EventHandler Finished;
+        private List<string> _commandsExecuted  = new List<string>();
+        
+        
+        public event EventHandler<EventArgs> Finished;
 
-        public NSorter(string folder, DateTime dateOfLogs, int memory)
+        private void OnSortFinished()
+        {
+            var handler = Finished;
+            if (handler != null) handler(this, EventArgs.Empty);
+            _waitHandle.Set();
+        }
+
+        public NSorter(string unsortedLogsFolder, string sortedLogsFolder, string tempFolder, DateTime dateOfLogs, int memory)
         {
             DateOfLogs = dateOfLogs;
-            Folder = folder.TrimEnd('\\');
-            FileList = GetFileList();
             Memory = memory;
             _instanceId = Guid.NewGuid();
-            _tempFolder = String.Format("{0}\\tmp\\{1}", Folder, _instanceId);
-            _outputFile = String.Format("{0}\\sorted\\{1}", Folder, FileUtils.DateToFileName("", DateOfLogs, "sorted"));
+            _tempFolder = Path.Combine(tempFolder, _instanceId.ToString());
+            _unsortedLogsFolder = unsortedLogsFolder.TrimEnd('\\');
+            _outputFile = Path.Combine(sortedLogsFolder, FileUtils.DateToFileName("", DateOfLogs, "sorted"));
+            FileList = GetFileList();
         }
 
         private List<string> GetFileList()
         {
-            return Directory.GetFiles(Folder, FileUtils.DateToFileName("", DateOfLogs, "*.requestData")).ToList();
+            return Directory.GetFiles(_unsortedLogsFolder, FileUtils.DateToFileName("", DateOfLogs, "*.requestData")).ToList();
         }
         
         public void WaitForExit()
@@ -141,12 +150,7 @@ namespace LogSorter
             SpawnSortProcess(mergeCommandLine, MergeProcessExited);
         }
 
-        private void OnSortFinished()
-        {
-            if (Finished != null)
-                Finished(this,EventArgs.Empty);
-            _waitHandle.Set();
-        }
+      
 
         private void MergeProcessExited(object sender, EventArgs e)
         {

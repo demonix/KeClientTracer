@@ -86,7 +86,7 @@ namespace LogReaderTest
         private static bool GetNextFileNameToProcess(string[] args, out string inputFile)
         {
             inputFile = "";
-            if (args.Length < 2)
+            if (args.Length < 1)
                 return false;
 
             if (args[0] == "-f")

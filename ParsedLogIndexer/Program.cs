@@ -64,7 +64,8 @@ namespace ParsedLogIndexer
         }
         private static void RunNewIndexer(FileInfo file, string indexFileName)
         {
-            using (StreamWriter indexFile = new StreamWriter(new FileStream(indexFileName,FileMode.Create,FileAccess.Write,FileShare.Read)))
+            Console.Out.WriteLine("\r\nBegin indexing {0}\r\n", file.FullName);
+            using (StreamWriter indexFile = new StreamWriter(new BufferedStream(new FileStream(indexFileName,FileMode.Create,FileAccess.Write,FileShare.Read))))
             using (Indexer indexer = new Indexer(file, '\t'))
             {
                 Stopwatch sw = new Stopwatch();
@@ -75,9 +76,13 @@ namespace ParsedLogIndexer
                 {
                     i++;
                     if (i % 1000 == 0)
-                        Console.Write("\rSpeed: {0} mb/min                      ",
+                        Console.Write("\rSpeed: {0} mb/min (o:{1}, l:{2}, m:{3})                      ",
                                       ((double)(indexKeyInfo.Offest+indexKeyInfo.Length) / 1024 / 1024) /
-                                      ((double)sw.ElapsedMilliseconds / 100 / 60));
+                                      sw.Elapsed.TotalMinutes,
+                                      indexKeyInfo.Offest,
+                                      indexKeyInfo.Length,
+                                      sw.Elapsed.TotalMinutes
+                                      );
                     try
                     {
                         string s = String.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n",
@@ -95,9 +100,10 @@ namespace ParsedLogIndexer
                             ex.Message, "-", "-", "-");
                             //indexer.CurrentKey, indexer.FirstKeyLine, indexer.LastKeyLine);
                     }
-                    sw.Stop();
+                   
 
                 }
+                sw.Stop();
             }
         }
 
