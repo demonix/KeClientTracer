@@ -25,7 +25,7 @@ namespace LogSorter
 
             var sortProcessCount = settings.TryGetValue("SimultaneousSortProcessCount");
             int simultaneousProcessCount;
-            if(Int32.TryParse(sortProcessCount, out simultaneousProcessCount))
+            if(!Int32.TryParse(sortProcessCount, out simultaneousProcessCount))
             {
                 simultaneousProcessCount = DefaultSimultaneousProcessCount;
             }
