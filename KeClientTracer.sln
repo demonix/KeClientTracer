@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeClientTracing", "KeClient
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogReaderApp", "LogReaderApp\LogReaderApp.csproj", "{F9020424-7F1E-43A3-A8E4-DE4D1ED3F254}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsortLicenseChecker", "NsortLicenseChecker\NsortLicenseChecker.csproj", "{65001DF3-A4B1-4953-9963-3652B151AA61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{F9020424-7F1E-43A3-A8E4-DE4D1ED3F254}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9020424-7F1E-43A3-A8E4-DE4D1ED3F254}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9020424-7F1E-43A3-A8E4-DE4D1ED3F254}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65001DF3-A4B1-4953-9963-3652B151AA61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65001DF3-A4B1-4953-9963-3652B151AA61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65001DF3-A4B1-4953-9963-3652B151AA61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65001DF3-A4B1-4953-9963-3652B151AA61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
