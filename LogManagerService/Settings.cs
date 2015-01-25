@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace LogManagerService
 {
@@ -19,15 +20,12 @@ namespace LogManagerService
                 if (_sortedLogsPaths == null)
                 {
                     List<string> result = new List<string>();
-                    var dir1 = _settings.TryGetValue("SortedLogsDirectory");
-                    if (String.IsNullOrEmpty(dir1))
+                    var dir = _settings.TryGetValue("SortedLogsDirectory");
+                    if (String.IsNullOrEmpty(dir))
                         throw new Exception("SortedLogsDirectory not specified");
-                    result.Add(dir1);
+                    
+                    result.AddRange(dir.Split(new [] {'|'}, StringSplitOptions.RemoveEmptyEntries).Select(s=> s.Trim()).ToArray());
 
-                    var dir2 = _settings.TryGetValue("SecondarySortedLogsDirectory");
-                    if (!String.IsNullOrEmpty(dir2))
-                        result.Add(dir2);
-                    //new List<string>() {".\\logs\\sorted\\", "F:\\nginxLogs\\logs\\sorted\\"};
                     _sortedLogsPaths = result;
                 }
                 return _sortedLogsPaths;
