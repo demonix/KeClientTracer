@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace LogProcessors.AuthRegistratorHelper
 {
@@ -80,14 +81,14 @@ namespace LogProcessors.AuthRegistratorHelper
         }
 
 
-
+        static ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random());
         private static string GetAuthRegistratorServer()
         {
             string server;
             string port;
                 
-                Random random = new Random();
-                int i = random.Next(0, topology.Length - 1);
+                
+                int i = random.Value.Next(0, topology.Length - 1);
                 server = topology[i].Split(':')[0];
                 port = topology[i].Split(':')[1];
 

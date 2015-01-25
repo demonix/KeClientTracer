@@ -15,11 +15,28 @@ namespace LogProcessors.CertificateHelper
 			owner = GetValue(distinguishedName, "SN");
 
 			certificateContent = certificate.GetRawCertData();
-            //ParsedOrganizationId parsedOrganizationId = ExtractParsedOrganizationId();
-			//inn = parsedOrganizationId != null ? parsedOrganizationId.Inn : "";
-			//kpp = parsedOrganizationId != null ? parsedOrganizationId.Kpp : "";
-			//innfl = parsedOrganizationId != null ? parsedOrganizationId.Innfl : "";
+		    IsEmpty = false;
+		    //ParsedOrganizationId parsedOrganizationId = ExtractParsedOrganizationId();
+		    //inn = parsedOrganizationId != null ? parsedOrganizationId.Inn : "";
+		    //kpp = parsedOrganizationId != null ? parsedOrganizationId.Kpp : "";
+		    //innfl = parsedOrganizationId != null ? parsedOrganizationId.Innfl : "";
 		}
+
+        public OrganizationCertificateDescription()
+        {
+            DistinguishedName distinguishedName = null;
+            subjectName = "";
+            organizationName ="";
+            unstructuredName = "";
+            email = "";
+            owner = "";
+            certificateContent = null;
+            IsEmpty = true;
+            //ParsedOrganizationId parsedOrganizationId = ExtractParsedOrganizationId();
+            //inn = parsedOrganizationId != null ? parsedOrganizationId.Inn : "";
+            //kpp = parsedOrganizationId != null ? parsedOrganizationId.Kpp : "";
+            //innfl = parsedOrganizationId != null ? parsedOrganizationId.Innfl : "";
+        }
 
 
 		private ParsedOrganizationId ExtractParsedOrganizationId()
@@ -30,6 +47,7 @@ namespace LogProcessors.CertificateHelper
 			return new ParsedOrganizationId(unstructuredName.Replace("--", "-").TrimEnd('-'));
 		}
 
+        public bool IsEmpty { get; private set; }
 		public string OrganizationName { get { return organizationName; } }
 		public string UnstructuredName { get { return unstructuredName; } }
 		//public string Inn { get { return inn; } }

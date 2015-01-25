@@ -10,6 +10,7 @@ namespace LogProcessors.Caches
 {
     public static class CertificateCache2
     {
+        static OrganizationCertificateDescription _emptyCertificateDescription = new OrganizationCertificateDescription();
         static AuthRegistratorClient arClient = new AuthRegistratorClient();
         public static OrganizationCertificateDescription Get(string thumbprint)
         {
@@ -18,21 +19,31 @@ namespace LogProcessors.Caches
             {
                 byte[] certificateData = arClient.GetCertificate(thumbprint);
                 if (certificateData == null)
-                    return null;
-                X509Certificate x509Certificate ;
-                try
                 {
-                    x509Certificate = new X509Certificate(certificateData);
+                    certificateData = arClient.GetCertificate(thumbprint);
                 }
-                catch (CryptographicException ex)
+
+                if (certificateData == null)
                 {
-                    throw new Exception("Error while creating cert from " + certificateData.Length + " bytes data", ex);
+                    result = _emptyCertificateDescription;
                 }
-                
-                result = new OrganizationCertificateDescription(x509Certificate);
+                else
+                {
+                    X509Certificate x509Certificate;
+                    try
+                    {
+                        x509Certificate = new X509Certificate(certificateData);
+                    }
+                    catch (CryptographicException ex)
+                    {
+                        throw new Exception("Error while creating cert from " + certificateData.Length + " bytes data", ex);
+                    }
+                    result = new OrganizationCertificateDescription(x509Certificate);
+                }
                 HttpRuntime.Cache.Add(thumbprint, result, null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(30), CacheItemPriority.Normal, null);
             }
-
+            if (result.IsEmpty)
+                return null;
             return result;
         }
     }

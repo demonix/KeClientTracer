@@ -14,7 +14,7 @@ namespace ParsedLogIndexer
         static void Main(string[] args)
         {
             Settings settings = Settings.GetInstance();
-            string dir = settings.TryGetValue("SortedLogsDirectory");
+            string dir = settings.TryGetValue("SortedLogsDirectory").Split('|')[0];
             if (String.IsNullOrEmpty(dir))
                 throw new Exception("SortedLogsDirectory not specified");
 

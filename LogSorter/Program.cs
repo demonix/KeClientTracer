@@ -36,7 +36,7 @@ namespace LogSorter
                 throw new Exception("UnsortedLogsDirectory not specified");
             string unsortedLogsDirectory = Path.GetFullPath(dir);
 
-            dir = settings.TryGetValue("SortedLogsDirectory");
+            dir = settings.TryGetValue("SortedLogsDirectory").Split('|')[0];
             if (String.IsNullOrEmpty(dir))
                 throw new Exception("SortedLogsDirectory not specified");
             string sortedLogsDirectory = Path.GetFullPath(dir);

@@ -16,7 +16,7 @@ namespace IndexUploader
             string serviceAddress = settings.TryGetValue("LogManagerServiceAddress");
             if (String.IsNullOrEmpty(serviceAddress))
                 throw new Exception("Log manager service address not specified");
-            string sortedLogsDirectory = settings.TryGetValue("SortedLogsDirectory");
+            string sortedLogsDirectory = settings.TryGetValue("SortedLogsDirectory").Split('|')[0];
             if (String.IsNullOrEmpty(sortedLogsDirectory))
                 throw new Exception("Sorted logs directory not specified");
 
