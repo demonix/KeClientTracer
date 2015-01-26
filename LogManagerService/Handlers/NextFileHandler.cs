@@ -42,9 +42,13 @@ namespace LogManagerService.Handlers
                 RotatedLog rotatedLog; 
                 if (ServiceState.GetInstance().AllLogs.TryGetValue(hash, out rotatedLog))
                 {
-                    result = rotatedLog.FileName;
-                    OpLog.Remove(hash);
-                    break;
+                    if (RotatedLog.ComputeHash(rotatedLog.FileName) == hash)
+                    {
+                        OpLog.Remove(hash);
+                        result = rotatedLog.FileName;
+                        break;
+                    }
+                    
                 }
                 hashesOfUnalavaliableFiles.Add(hash);
             }
