@@ -33,7 +33,7 @@ namespace LogManagerService.DbLayer
             result.AppendFormat("<td><a href=\"../logdata/?id={0}&date={1}\">{0}</a> (<a href=\"../logdata/?id={0}&date={1}&outtype=parsed&showStatic=no\">с описанием</a>)</td>", id, date.ToString("dd.MM.yyyy"));
             result.AppendFormat("<td>{0}</td>", date.ToString("dd.MM.yyyy (ddd)"));
             result.AppendFormat("<td>{0}</td>", host);
-            result.AppendFormat("<td>{0}</td>", ip);
+            result.AppendFormat("<td>{0}</td>", Settings.IsKonturIp(ip)? ip +" Контуровский!":ip);
             result.AppendFormat("<td>{0}</td>", inn);
             result.AppendFormat("<td>{0}</td>", sessionId);
             result.AppendFormat("<td>{0}:{1}:{2}</td>", sessionStart.Hours.ToString("D2"), sessionStart.Minutes.ToString("D2"), sessionStart.Seconds.ToString("D2"));
@@ -42,5 +42,6 @@ namespace LogManagerService.DbLayer
             return result.ToString();
 
         }
+
     }
 }

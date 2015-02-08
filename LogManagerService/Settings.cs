@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using LukeSkywalker.IPNetwork;
 
 namespace LogManagerService
 {
@@ -33,6 +35,37 @@ namespace LogManagerService
             }
         }
 
+        private static List<IPNetwork> _konturIps = null;
+        public static List<IPNetwork> KonturIps
+        {
+            get
+            {
+                if (_konturIps == null)
+                {
+                    List<IPNetwork> result = new List<IPNetwork>();
+                    var ips = _settings.TryGetValue("KonturIps");
+                    if (String.IsNullOrEmpty(ips))
+                    {
+                        _konturIps = new List<IPNetwork>();
+                    }
+                    else
+                    {
+                        result.AddRange(ips.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries).Select(s => IPNetwork.Parse(s.Trim())).Distinct().ToArray());
+                        _konturIps = result;
+                    }
+                }
+                return _konturIps;
+
+            }
+        }
+        public static bool IsKonturIp(string ipAddrString)
+        {
+            IPAddress ipAddress;
+            if (IPAddress.TryParse(ipAddrString, out ipAddress))
+                return KonturIps.Any(ipNet => IPNetwork.Contains(ipNet, ipAddress));
+            return false;
+        }
+ 
         
         public const double LogListRefreshInterval = 2*60*60;
 
