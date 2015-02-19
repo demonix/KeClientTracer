@@ -15,6 +15,11 @@ namespace LogManagerService.DbLayer
             _findResults = resultList;
         }
 
+        public List<FindResultEntry> Items
+        {
+            get { return _findResults; }
+        }
+
         public int Count()
         {
             return _findResults.Count;

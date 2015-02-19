@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SqlClient;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using LogManagerService.DbLayer;
 
 namespace LogManagerService.Handlers
@@ -61,6 +63,50 @@ namespace LogManagerService.Handlers
             }
 
             FindResult results = ServiceState.GetInstance().Db.Find(conditions);
+
+            
+             
+                    
+
+            if (HasParam("filter"))
+            {
+
+                FindResult filteredResults = new FindResult();
+                string filterValue = RequestParams("filter");
+                Regex regex = new Regex(filterValue, RegexOptions.IgnoreCase);
+                foreach (var findResultEntry in results.Items)
+                {
+                    LogDataPlacementDescription ldpd;
+                    string file;
+                    LogDataPlacementDescription.GetLdpdAndLogPathInfo(findResultEntry.Id, findResultEntry.Date.ToString("dd-MM-yyyy"), out ldpd, out file);
+                    if (ldpd == null || file == null)
+                    {
+                        continue;
+                    }
+
+                    bool matchFound = false;
+                    int lineCount = 0;
+                    using (var stream = LogDataPlacementDescription.GetOutputDataStream(file, ldpd.Offset, ldpd.Length))
+                    {
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            string line;
+                            while ((line = reader.ReadLine()) != null)
+                            {
+                                lineCount++;
+                                if (regex.IsMatch(line))
+                                {
+                                    matchFound = true;
+                                    break;
+                                }
+                            }
+                        }   
+                    }
+                    if (matchFound)
+                        filteredResults.Items.Add(findResultEntry);
+                }
+                results = filteredResults;
+            }
             
             if (results.Count() >0)
             {

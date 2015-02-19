@@ -47,25 +47,18 @@ namespace LogManagerService.Handlers
                 return;
             }
             string outType = HasParam("outType") ?RequestParams("outType").ToLower():"";
-            LogDataPlacementDescription ldpd = ServiceState.GetInstance().Db.GetLogDataPlacementDescription(RequestParams("id"), RequestParams("date"));
+            LogDataPlacementDescription ldpd;
+            string file;
+            string id = RequestParams("id");
+            string date = RequestParams("date");
+            LogDataPlacementDescription.GetLdpdAndLogPathInfo(id, date, out ldpd, out file);
+
             if (ldpd == null)
             {
                 WriteResponse("no such id", HttpStatusCode.NotFound, "no such id");
                 return;
             }
-            
 
-            string file = null;
-
-            foreach (string sortedLogsPath in Settings.SortedLogsPaths)
-            {
-                var possiblePath = FileUtils.DateToFileName(sortedLogsPath, ldpd.Date, "sorted");    
-                if (File.Exists(possiblePath))
-                {
-                    file = possiblePath;
-                    break;
-                } 
-            }
             if (String.IsNullOrEmpty(file))
             {
                 WriteResponse(Encoding.UTF8.GetBytes("Файл с данными за " + ldpd.Date.ToShortDateString() +" не найден, обратитесь в СПС."), HttpStatusCode.OK, "OK", "text/plain; charset=utf-8");
@@ -88,6 +81,8 @@ namespace LogManagerService.Handlers
             
         }
 
+        
+
         private void ParsedOutput(string file, long offset, long length)
         {
             bool showStatic = false;
@@ -96,7 +91,7 @@ namespace LogManagerService.Handlers
                     
 
             StringBuilder sb = new StringBuilder();
-            using (Stream stream = GetOutputDataStream(file, offset, length))
+            using (Stream stream = LogDataPlacementDescription.GetOutputDataStream(file, offset, length))
             {
                 using (StreamReader sr = new StreamReader(stream))
                 {
@@ -133,7 +128,7 @@ namespace LogManagerService.Handlers
         private void SimpleTxtOutput(string file, long offset, long length)
         {
             StringBuilder sb = new StringBuilder();
-            using (Stream stream = GetOutputDataStream(file, offset, length))
+            using (Stream stream = LogDataPlacementDescription.GetOutputDataStream(file, offset, length))
             {
                 using (StreamReader sr = new StreamReader(stream))
                 {
@@ -151,33 +146,12 @@ namespace LogManagerService.Handlers
 
         private void DefaultOutput(string file, long offset, long length)
         {
-            using (Stream stream = GetOutputDataStream(file, offset, length))
+            using (Stream stream = LogDataPlacementDescription.GetOutputDataStream(file, offset, length))
             {
                 WriteResponse(((MemoryStream)stream).GetBuffer(), HttpStatusCode.OK, "OK");
             }
         }
 
-        private Stream GetOutputDataStream(string file, long offset, long length)
-        {
-            Stream st = new MemoryStream();
-            using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                //TODO: Remove this after fixing an indexer
-                OffsetHack(fs, ref offset);
-                fs.Seek(offset, SeekOrigin.Begin);
-                fs.CopyToStream(st, length);
-
-            }
-            st.Seek(0, SeekOrigin.Begin);
-            return st;
-        }
-
-        private void OffsetHack(Stream stream, ref long offset)
-        {
-            stream.Seek(offset-1, SeekOrigin.Begin);
-            int readByte = stream.ReadByte();
-            if (readByte != 10)
-                offset = offset - 1;
-        }
+        
     }
 }
